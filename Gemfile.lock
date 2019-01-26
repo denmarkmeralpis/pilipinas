@@ -122,7 +122,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.17)
+  bundler (~> 1.16)
   byebug
   dotenv
   generator_spec
@@ -135,4 +135,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.17.1
+   1.16.6
