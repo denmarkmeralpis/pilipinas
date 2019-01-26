@@ -11,3 +11,4 @@
 .byebug_history
 .rubocop_todo.yml
 .rubocop.yml
+*.gem
