@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
     spec.metadata['allowed_push_host'] = 'http://rubygems.org'
     spec.metadata['homepage_uri'] = spec.homepage
     spec.metadata['source_code_uri'] = 'https://github.com/denmarkmeralpis/pilipinas'
-    spec.metadata['changelog_uri'] = 'https://github.com/denmarkmeralpis/pilipinas'
+    spec.metadata['changelog_uri'] = 'https://github.com/denmarkmeralpis/pilipinas/blob/master/README.md'
   else
     raise 'RubyGems 2.0 or newer is required to protect against ' \
       'public gem pushes.'
