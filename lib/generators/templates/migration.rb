@@ -18,8 +18,10 @@ class CreateLocations < ActiveRecord::Migration<%= migration_version %>
       t.timestamps default: Time.now
     end
 
-    add_index :locations, :parent_id
-    add_index :locations, :postcode
-    add_index :locations, [:name, :location_type, :postcode]
+    add_index :pilipinas_locations, :location_id
+    add_index :pilipinas_locations, :code
+    add_index :pilipinas_locations, :parent_id
+    add_index :pilipinas_locations, :postcode
+    add_index :pilipinas_locations, [:name, :location_type, :postcode]
   end
 end
