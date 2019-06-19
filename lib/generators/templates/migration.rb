@@ -4,7 +4,7 @@ class CreateLocations < ActiveRecord::Migration<%= migration_version %>
       t.bigint  :parent_id
       t.integer :lft
       t.integer :rgt
-      t.string  :location_type
+      t.string  :type
       t.string  :code
       t.string  :name
       t.boolean :city, default: false
@@ -22,6 +22,6 @@ class CreateLocations < ActiveRecord::Migration<%= migration_version %>
     add_index :pilipinas_locations, :code
     add_index :pilipinas_locations, :parent_id
     add_index :pilipinas_locations, :postcode
-    add_index :pilipinas_locations, [:name, :location_type, :postcode]
+    add_index :pilipinas_locations, [:name, :location_type, :postcode], name: 'index_pilipinas_locations_on_name_type_postcode'
   end
 end
