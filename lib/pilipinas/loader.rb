@@ -4,7 +4,7 @@ require 'yaml_db'
 module Pilipinas
   class Loader
     def self.run
-      SerializationHelper::Base.new(YamlDb::Helper).load(data_file)
+      YamlDb::SerializationHelper::Base.new(YamlDb::Helper).load(data_file)
     end
 
     def self.data_file
