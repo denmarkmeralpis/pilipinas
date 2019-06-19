@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pilipinas (0.0.2)
+    pilipinas (0.0.3)
 
 GEM
   remote: https://rubygems.org/
