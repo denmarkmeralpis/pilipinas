@@ -6,6 +6,7 @@ require 'pilipinas/province'
 require 'pilipinas/city'
 require 'pilipinas/barangay'
 require 'pilipinas/loader'
+require 'pilipinas/railtie'
 
 module Pilipinas
   class Error < StandardError; end
