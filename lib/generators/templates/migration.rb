@@ -1,6 +1,6 @@
 class CreateLocations < ActiveRecord::Migration<%= migration_version %>
   def change
-    create_table :locations do |t|
+    create_table :pilipinas_locations do |t|
       t.bigint  :parent_id
       t.integer :lft
       t.integer :rgt
