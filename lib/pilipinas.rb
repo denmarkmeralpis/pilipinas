@@ -7,6 +7,8 @@ require 'pilipinas/city'
 require 'pilipinas/barangay'
 require 'pilipinas/loader'
 require 'pilipinas/railtie'
+require 'fileutils'
+require 'yaml_db'
 
 module Pilipinas
   class Error < StandardError; end

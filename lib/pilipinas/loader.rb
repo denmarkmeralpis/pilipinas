@@ -1,6 +1,3 @@
-require 'fileutils'
-require 'yaml_db'
-
 module Pilipinas
   class Loader
     def self.run
