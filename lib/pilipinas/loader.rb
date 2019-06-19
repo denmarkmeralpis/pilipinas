@@ -8,7 +8,7 @@ module Pilipinas
     end
 
     def self.data_file
-      File.expand_path('../data/pilipinas_data.yml', __FILE__)
+      File.expand_path('../../data/pilipinas_data.yml', __FILE__)
     end
   end
 end
