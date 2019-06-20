@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pilipinas (0.0.10)
+    pilipinas (0.0.12)
       yaml_db
 
 GEM
@@ -195,4 +195,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
