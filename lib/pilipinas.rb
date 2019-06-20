@@ -13,4 +13,9 @@ require 'yaml_db'
 module Pilipinas
   class Error < StandardError; end
   class UnknownAttribute < Error; end
+
+  autoload :Region, 'pilipinas/db/region'
+  autoload :Province, 'pilipinas/db/province'
+  autoload :City, 'pilipinas/db/city'
+  autoload :Barangay, 'pilipinas/db/barangay'
 end
