@@ -14,8 +14,10 @@ module Pilipinas
   class Error < StandardError; end
   class UnknownAttribute < Error; end
 
-  autoload :Region, 'pilipinas/db/region'
-  autoload :Province, 'pilipinas/db/province'
-  autoload :City, 'pilipinas/db/city'
-  autoload :Barangay, 'pilipinas/db/barangay'
+  module Db
+    autoload :Region, 'pilipinas/db/region'
+    autoload :Province, 'pilipinas/db/province'
+    autoload :City, 'pilipinas/db/city'
+    autoload :Barangay, 'pilipinas/db/barangay'
+  end
 end
