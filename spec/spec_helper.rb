@@ -3,6 +3,8 @@ require 'byebug'
 require 'pilipinas'
 require 'simplecov'
 require 'simplecov-console'
+require 'shoulda-matchers'
+require 'active_record'
 
 SimpleCov.start
 
@@ -17,3 +19,17 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+
+    # Keep as many of these lines as are necessary:
+    with.library :active_record
+    with.library :active_model
+  end
+end
+
+ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+
+load File.dirname(__FILE__) + '/schema.rb'
