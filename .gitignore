@@ -6,6 +6,9 @@
 /pkg/
 /spec/reports/
 /tmp/
-
 # rspec failure tracking
-.rspec_status
+/.rspec_status
+/.byebug_history
+/.rubocop_todo.yml
+/.rubocop.yml
+*.gem

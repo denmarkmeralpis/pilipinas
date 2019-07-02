@@ -13,8 +13,8 @@ RSpec.describe Pilipinas::Province do
     end
   end
 
-  describe '#provinces' do
-    it 'returns array of provinces' do
+  describe '#cities' do
+    it 'returns array of cities' do
       expect(province.first.cities).to be_an(Array)
     end
   end

@@ -13,7 +13,7 @@ RSpec.describe Pilipinas::City do
     end
   end
 
-  describe '#provinces' do
+  describe '#barangays' do
     it 'returns array of barangays' do
       expect(city.first.barangays).to be_an(Array)
     end

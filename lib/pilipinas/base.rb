@@ -40,11 +40,17 @@ module Pilipinas
         raise 'Implement load_data'
       end
 
-      def method_missing(*args)
-        load_data unless data
+      def find_by(options)
+        raise 'invalid hash' if options.empty?
 
+        select_by(options.keys.first.to_s, options.values.first.to_s)
+      end
+
+      def method_missing(*args)
         regex = args.first.to_s.match(/^find_by_(.*)/)
         super if !regex || Regexp.last_match(1).nil?
+
+        load_data unless data
         select_by(Regexp.last_match(1), args[1])
       end
 
