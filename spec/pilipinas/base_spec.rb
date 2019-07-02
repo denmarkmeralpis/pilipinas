@@ -38,7 +38,8 @@ RSpec.describe Pilipinas::Base do
       let(:hash) { { test: 0 } }
 
       it 'raises an error' do
-        expect { region.find_by(hash) }.to raise_error(StandardError)
+        expect { region.find_by(hash) }
+          .to raise_error(Pilipinas::UnknownAttribute)
       end
     end
   end

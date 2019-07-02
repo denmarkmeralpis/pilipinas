@@ -42,8 +42,7 @@ module Pilipinas
 
       def find_by(options)
         raise 'invalid hash' if options.empty?
-
-        select_by(options.keys.first.to_s, options.values.first.to_s)
+        send "find_by_#{options.keys.first.to_s}", options.values.first.to_s
       end
 
       def method_missing(*args)
