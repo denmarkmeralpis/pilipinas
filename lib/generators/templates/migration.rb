@@ -36,6 +36,7 @@ class CreateLocations < ActiveRecord::Migration<%= migration_version %>
       t.string  :district
       t.string  :longitude
       t.string  :latitude
+      t.boolean :capital, default: false
       t.timestamps default: Time.now
     end
 
