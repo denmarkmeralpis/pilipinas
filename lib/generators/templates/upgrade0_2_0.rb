@@ -1,4 +1,4 @@
-class UpgradeLocations < ActiveRecord::Migration<%= migration_version %>
+class UpgradeLocations020 < ActiveRecord::Migration<%= migration_version %>
   def up
     add_column :pilipinas_cities, :capital, :boolean, default: false
     capital_migration_array.each do |migration|
