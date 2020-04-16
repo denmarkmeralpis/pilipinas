@@ -18,7 +18,7 @@ module Pilipinas
     private
 
     def generate_block_migration
-      migration_template 'templates/upgrade020.rb', 'db/migrate/upgrade_locations020.rb'
+      migration_template 'templates/upgrade0_2_0.rb', 'db/migrate/upgrade_locations0_2_0.rb'
     end
 
     def migration_version
