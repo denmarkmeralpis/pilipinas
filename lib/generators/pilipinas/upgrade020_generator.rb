@@ -2,7 +2,7 @@ require 'rails/generators/base'
 require 'rails/generators/active_record'
 
 module Pilipinas
-  class Upgrade020Generator < Rails::Generators::Base
+  class UpgradeGenerator < Rails::Generators::Base
     include Rails::Generators::Migration
 
     source_root File.expand_path('../', __dir__)
@@ -18,7 +18,7 @@ module Pilipinas
     private
 
     def generate_block_migration
-      migration_template 'templates/upgrade0_2_0.rb', 'db/migrate/upgrade_locations0_2_0.rb'
+      migration_template 'templates/upgrade.rb', 'db/migrate/upgrade_locations.rb'
     end
 
     def migration_version
