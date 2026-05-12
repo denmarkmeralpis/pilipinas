@@ -26,6 +26,11 @@ module Pilipinas
   # therefore inherently thread-safe.
   #
   class Base
+    # Maps supported attribute names to their index key — avoids allocating a
+    # dynamic Symbol on every look-up call.
+    LOOKUP_KEYS = { code: :by_code, name: :by_name }.freeze
+    private_constant :LOOKUP_KEYS
+
     # @return [String] geographic code (always a String, never nil)
     attr_reader :code
 
@@ -126,13 +131,23 @@ module Pilipinas
       # Results are cached in {Cache}; repeated calls with the same arguments
       # are zero-cost after the first invocation.
       #
+      # Instances are resolved from the canonical index rather than freshly
+      # constructed, so no duplicate objects exist in memory when both the
+      # full collection (e.g. +Barangay.all+) and an association (e.g.
+      # +city.barangays+) are accessed in the same process.
+      #
       # @param code [String, Integer] parent entity's code
       # @param dir  [Symbol, String]  sub-directory name under +data/+
       # @return [Array<Base>]
       def assoc_collection(code:, dir:)
-        file = File.join(Pilipinas::DATA_DIR, dir.to_s, "#{code}.yml")
+        # Pre-warm the canonical index outside the Cache.fetch block.
+        # If the index is not yet cached, this call acquires and releases the
+        # mutex.  Once warm, find_by inside the block hits the lock-free fast
+        # path, preventing recursive locking (deadlock) on the same Mutex.
+        index
         Cache.fetch("assoc:#{name}:#{code}") do
-          load_yaml(file).map { |h| build(h) }.freeze
+          file = File.join(Pilipinas::DATA_DIR, dir.to_s, "#{code}.yml")
+          load_yaml(file).filter_map { |h| find_by(code: h[:code]) }.freeze
         end
       end
 
@@ -222,10 +237,10 @@ module Pilipinas
       # @raise [UnknownAttribute]
       # @return [Base, nil]
       def find_by_attribute(attribute, value)
-        raise UnknownAttribute, "Invalid attribute '#{attribute}'." \
-          unless %i[code name].include?(attribute)
+        index_key = LOOKUP_KEYS[attribute]
+        raise UnknownAttribute, "Invalid attribute '#{attribute}'." unless index_key
 
-        index[:"by_#{attribute}"][value.to_s.downcase]
+        index[index_key][value.downcase]
       end
 
       # Parse a YAML file and return an Array of Hashes.
