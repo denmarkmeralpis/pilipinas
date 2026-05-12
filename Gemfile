@@ -12,7 +12,8 @@ end
 
 group :test do
   gem 'generator_spec'
-  gem 'rubocop',          '~> 1.65', require: false
+  gem 'rubocop', '~> 1.65', require: false
+  gem 'rubocop-rake'
   gem 'rubocop-rspec',    '~> 3.0',  require: false
   gem 'simplecov',        '~> 0.22', require: false
   gem 'simplecov-console', '~> 0.9', require: false

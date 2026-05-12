@@ -2,6 +2,7 @@
 # RuboCop configuration for Pilipinas gem
 AllCops:
   NewCops: enable
+  SuggestExtensions: false
   TargetRubyVersion: 3.4
   Exclude:
     - "bin/**/*"
@@ -15,7 +16,6 @@ Layout/LineLength:
 Metrics/BlockLength:
   Exclude:
     - "spec/**/*"
-    - "Guardfile"
 
 Metrics/MethodLength:
   Max: 20
