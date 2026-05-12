@@ -56,20 +56,20 @@ ActiveRecord::Schema.define do
 
   add_index :pilipinas_regions,   :location_id, unique: true
   add_index :pilipinas_regions,   :code,        unique: true
-  add_index :pilipinas_regions,   :rgt
+  add_index :pilipinas_regions,   %i[lft rgt],  name: 'idx_pilipinas_regions_lft_rgt'
 
   add_index :pilipinas_provinces, :location_id, unique: true
   add_index :pilipinas_provinces, :code,        unique: true
   add_index :pilipinas_provinces, :parent_id
-  add_index :pilipinas_provinces, :rgt
+  add_index :pilipinas_provinces, %i[lft rgt],  name: 'idx_pilipinas_provinces_lft_rgt'
 
   add_index :pilipinas_cities,    :location_id, unique: true
   add_index :pilipinas_cities,    :code,        unique: true
   add_index :pilipinas_cities,    :parent_id
-  add_index :pilipinas_cities,    :rgt
+  add_index :pilipinas_cities,    %i[lft rgt],  name: 'idx_pilipinas_cities_lft_rgt'
 
   add_index :pilipinas_barangays, :location_id, unique: true
   add_index :pilipinas_barangays, :code,        unique: true
   add_index :pilipinas_barangays, :parent_id
-  add_index :pilipinas_barangays, :rgt
+  add_index :pilipinas_barangays, %i[lft rgt],  name: 'idx_pilipinas_barangays_lft_rgt'
 end
