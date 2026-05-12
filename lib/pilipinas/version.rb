@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
 module Pilipinas
-  VERSION = '0.1.2'.freeze
+  # Semantic version of the gem.
+  #
+  # Follows {https://semver.org Semantic Versioning}: MAJOR.MINOR.PATCH.
+  VERSION = "1.0.0"
 end
+
