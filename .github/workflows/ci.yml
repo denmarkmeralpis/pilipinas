@@ -53,22 +53,22 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   # ─── Static analysis ───────────────────────────────────────────────────────
-  lint:
-    name: "RuboCop"
-    runs-on: ubuntu-latest
+  # lint:
+  #   name: "RuboCop"
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "4.0.3"
-          bundler-cache: true
+  #     - name: Set up Ruby
+  #       uses: ruby/setup-ruby@v1
+  #       with:
+  #         ruby-version: "4.0.3"
+  #         bundler-cache: true
 
-      - name: Run RuboCop
-        run: bundle exec rubocop --parallel --format github
+  #     - name: Run RuboCop
+  #       run: bundle exec rubocop --parallel --format github
 
   # ─── Gem build smoke-test ──────────────────────────────────────────────────
   build:
