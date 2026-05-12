@@ -1,9 +1,27 @@
+# frozen_string_literal: true
+
+require_relative "concerns/static_record"
+
 module Pilipinas
   module Db
+    # ActiveRecord model backed by the +pilipinas_cities+ table.
     class City < ActiveRecord::Base
-      self.table_name = 'pilipinas_cities'
-      has_many :barangays, foreign_key: :parent_id, primary_key: :location_id
-      belongs_to :province, foreign_key: :parent_id, primary_key: :location_id
+      include Concerns::StaticRecord
+
+      self.table_name = "pilipinas_cities"
+
+      belongs_to :province,
+                 -> { select(Concerns::StaticRecord::TRAVERSAL_COLUMNS) },
+                 foreign_key: :parent_id,
+                 primary_key: :location_id,
+                 optional:    true
+
+      has_many   :barangays,
+                 -> { select(Concerns::StaticRecord::TRAVERSAL_COLUMNS) },
+                 foreign_key: :parent_id,
+                 primary_key: :location_id
     end
   end
 end
+
+
