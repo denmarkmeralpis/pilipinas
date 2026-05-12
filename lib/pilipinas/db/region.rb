@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "concerns/static_record"
+require_relative 'concerns/static_record'
 
 module Pilipinas
   module Db
@@ -8,7 +8,7 @@ module Pilipinas
     class Region < ActiveRecord::Base
       include Concerns::StaticRecord
 
-      self.table_name = "pilipinas_regions"
+      self.table_name = 'pilipinas_regions'
 
       # Traversal scope restricts SELECT to the five columns needed for
       # navigation, avoiding lft/rgt/longitude/latitude overhead.
@@ -19,5 +19,3 @@ module Pilipinas
     end
   end
 end
-
-

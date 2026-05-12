@@ -82,7 +82,7 @@ module Pilipinas
           #
           # @param name [String]
           # @return [ActiveRecord::Relation]
-          scope :by_name, ->(name) { where("LOWER(name) = LOWER(?)", name.to_s) }
+          scope :by_name, ->(name) { where('LOWER(name) = LOWER(?)', name.to_s) }
 
           # Convenience: lite + single record by code.
           #

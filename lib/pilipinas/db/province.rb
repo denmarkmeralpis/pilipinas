@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "concerns/static_record"
+require_relative 'concerns/static_record'
 
 module Pilipinas
   module Db
@@ -8,13 +8,13 @@ module Pilipinas
     class Province < ActiveRecord::Base
       include Concerns::StaticRecord
 
-      self.table_name = "pilipinas_provinces"
+      self.table_name = 'pilipinas_provinces'
 
       belongs_to :region,
                  -> { select(Concerns::StaticRecord::TRAVERSAL_COLUMNS) },
                  foreign_key: :parent_id,
                  primary_key: :location_id,
-                 optional:    true
+                 optional: true
 
       has_many   :cities,
                  -> { select(Concerns::StaticRecord::TRAVERSAL_COLUMNS) },
@@ -23,5 +23,3 @@ module Pilipinas
     end
   end
 end
-
-

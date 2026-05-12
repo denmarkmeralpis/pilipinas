@@ -24,7 +24,7 @@ module Pilipinas
 
       # @return [String] absolute path to the cities YAML file
       def data_file
-        File.join(Pilipinas::DATA_DIR, "cities.yml")
+        File.join(Pilipinas::DATA_DIR, 'cities.yml')
       end
     end
   end

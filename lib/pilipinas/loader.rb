@@ -28,10 +28,10 @@ module Pilipinas
       # @return [void]
       def run
         ActiveRecord::Base.transaction do
-          seed(Db::Region,   "regions.yml")
-          seed(Db::Province, "provinces.yml")
-          seed(Db::City,     "cities.yml")
-          seed(Db::Barangay, "barangays.yml")
+          seed(Db::Region,   'regions.yml')
+          seed(Db::Province, 'provinces.yml')
+          seed(Db::City,     'cities.yml')
+          seed(Db::Barangay, 'barangays.yml')
         end
       end
 
@@ -52,7 +52,7 @@ module Pilipinas
         # copy of all rows in memory at once.  For barangays (~42 k rows) this
         # halves peak transient allocation compared to map-then-slice.
         records.each_slice(BATCH_SIZE) do |slice|
-          batch = slice.map { |r| r.transform_keys(&:to_s).merge("created_at" => now, "updated_at" => now) }
+          batch = slice.map { |r| r.transform_keys(&:to_s).merge('created_at' => now, 'updated_at' => now) }
           bulk_insert(model, batch)
         end
       end

@@ -44,7 +44,7 @@ module Pilipinas
 
     # @return [String]
     def to_s
-      "#{self.class.name.split("::").last}(code: #{@code}, name: #{@name})"
+      "#{self.class.name.split('::').last}(code: #{@code}, name: #{@name})"
     end
 
     # @return [String]
@@ -115,7 +115,7 @@ module Pilipinas
       # @raise [UnknownAttribute] if the key is not +:code+ or +:name+
       # @return [Base, nil]
       def find_by(options)
-        raise ArgumentError, "options hash must not be empty" if options.empty?
+        raise ArgumentError, 'options hash must not be empty' if options.empty?
 
         attribute, value = options.first
         find_by_attribute(attribute.to_sym, value.to_s)
@@ -159,7 +159,7 @@ module Pilipinas
       #
       # @raise [UnknownAttribute] for any attribute other than +code+/+name+
       # @return [Base, nil]
-      def method_missing(method_name, *args, **_kwargs, &_block)
+      def method_missing(method_name, *args, **_kwargs, &)
         match = method_name.to_s.match(/\Afind_by_(.+)\z/)
         return super unless match
 

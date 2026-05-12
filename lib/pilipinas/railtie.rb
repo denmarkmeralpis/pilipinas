@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "rails"
-require "pilipinas"
+require 'rails'
+require 'pilipinas'
 
 module Pilipinas
   # Integrates Pilipinas with Ruby on Rails.
@@ -13,7 +13,7 @@ module Pilipinas
     railtie_name :pilipinas
 
     rake_tasks do
-      tasks_path = File.expand_path("../tasks", __dir__)
+      tasks_path = File.expand_path('../tasks', __dir__)
       Dir.glob("#{tasks_path}/**/*.rake").each { |f| load f }
     end
   end

@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require "psych"
-require "pilipinas/version"
-require "pilipinas/cache"
-require "pilipinas/base"
-require "pilipinas/region"
-require "pilipinas/province"
-require "pilipinas/city"
-require "pilipinas/barangay"
-require "pilipinas/loader"
+require 'psych'
+require 'pilipinas/version'
+require 'pilipinas/cache'
+require 'pilipinas/base'
+require 'pilipinas/region'
+require 'pilipinas/province'
+require 'pilipinas/city'
+require 'pilipinas/barangay'
+require 'pilipinas/loader'
 # :nocov:
-require "pilipinas/railtie" if defined?(Rails)
+require 'pilipinas/railtie' if defined?(Rails)
 # :nocov:
 
 # Top-level namespace for the Pilipinas gem.
@@ -53,13 +53,13 @@ module Pilipinas
 
   # Absolute path to the bundled +data/+ directory.
   # @api private
-  DATA_DIR = File.expand_path("data", __dir__).freeze
+  DATA_DIR = File.expand_path('data', __dir__).freeze
 
   # ActiveRecord-backed models (opt-in; requires ActiveRecord to be loaded).
   module Db
-    autoload :Region,   "pilipinas/db/region"
-    autoload :Province, "pilipinas/db/province"
-    autoload :City,     "pilipinas/db/city"
-    autoload :Barangay, "pilipinas/db/barangay"
+    autoload :Region,   'pilipinas/db/region'
+    autoload :Province, 'pilipinas/db/province'
+    autoload :City,     'pilipinas/db/city'
+    autoload :Barangay, 'pilipinas/db/barangay'
   end
 end

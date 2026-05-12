@@ -1,23 +1,23 @@
 # frozen_string_literal: true
 
-require "bundler/setup"
-require "simplecov"
-require "simplecov-console"
+require 'bundler/setup'
+require 'simplecov'
+require 'simplecov-console'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
   [SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::Console]
 )
 SimpleCov.start do
-  add_filter "/spec/"
+  add_filter '/spec/'
   enable_coverage :branch
 end
 
-require "pilipinas"
-require "shoulda-matchers"
-require "active_record"
+require 'pilipinas'
+require 'shoulda-matchers'
+require 'active_record'
 
 RSpec.configure do |config|
-  config.example_status_persistence_file_path = ".rspec_status"
+  config.example_status_persistence_file_path = '.rspec_status'
   config.disable_monkey_patching!
 
   config.expect_with :rspec do |c|
@@ -36,6 +36,6 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
-ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 
-load File.join(__dir__, "schema.rb")
+load File.join(__dir__, 'schema.rb')
