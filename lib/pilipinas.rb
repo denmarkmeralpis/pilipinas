@@ -9,7 +9,9 @@ require "pilipinas/province"
 require "pilipinas/city"
 require "pilipinas/barangay"
 require "pilipinas/loader"
+# :nocov:
 require "pilipinas/railtie" if defined?(Rails)
+# :nocov:
 
 # Top-level namespace for the Pilipinas gem.
 #

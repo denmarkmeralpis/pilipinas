@@ -239,12 +239,8 @@ module Pilipinas
         return [] unless File.exist?(file)
 
         Psych.load_file(file) || []
-      rescue Errno::ENOENT
-        []
       end
 
-      # Prevent external instantiation; instances are created only through the
-      # class-level query interface.
       private :new
     end
   end
