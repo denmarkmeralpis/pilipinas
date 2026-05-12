@@ -1,0 +1,34 @@
+# .rubocop.yml
+# RuboCop configuration for Pilipinas gem
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.4
+  Exclude:
+    - "bin/**/*"
+    - "lib/generators/templates/**/*"
+    - "spec/schema.rb"
+    - "*.gemspec"
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+    - "Guardfile"
+
+Metrics/MethodLength:
+  Max: 20
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# Cache.fetch is a custom method that only accepts a block; this cop incorrectly
+# treats it like Hash#fetch and suggests the two-argument form.
+Style/RedundantFetchBlock:
+  Exclude:
+    - "spec/pilipinas/cache_spec.rb"
