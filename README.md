@@ -238,53 +238,7 @@ The gem is available as open source under the terms of the [MIT License](LICENSE
 
 ## Acknowledgements
 
-The geographic data used in this gem is derived from the Philippine Standard Geographic Code (PSGC) published by the Philippine Statistics Authority.
-
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'pilipinas'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install pilipinas
-
-## Usage
-
-```ruby
-# All Regions
-Pilipinas::Region.all
-
-# All Provinces
-Pilipinas::Province.all
-
-# All Cities/Municipalities
-Pilipinas::City.all
-
-# All Barangays
-Pilipinas::Barangay.all
-
-# Finding record thru find_by_(code/name) method
-region = Pilipinas::Region.find_by_name("REGION V (Bicol Region)")
-
-# Get provinces by region
-region.provinces
-```
-## Acknowledgement
-
 The data used in this gem is from `gem pinas`. Kudos!
-
-## TODO
-
-* Add a form helper
 
 ## Development
 
