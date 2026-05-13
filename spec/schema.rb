@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# In-memory SQLite schema used by RSpec for AR model association tests.
 ActiveRecord::Schema.define do
   self.verbose = false
 
@@ -9,7 +12,7 @@ ActiveRecord::Schema.define do
     t.string  :name
     t.string  :longitude
     t.string  :latitude
-    t.timestamps default: Time.now
+    t.timestamps null: false
   end
 
   create_table :pilipinas_provinces, force: true do |t|
@@ -21,7 +24,7 @@ ActiveRecord::Schema.define do
     t.string  :name
     t.string  :longitude
     t.string  :latitude
-    t.timestamps default: Time.now
+    t.timestamps null: false
   end
 
   create_table :pilipinas_cities, force: true do |t|
@@ -31,13 +34,13 @@ ActiveRecord::Schema.define do
     t.integer :rgt
     t.string  :code
     t.string  :name
-    t.boolean :city, default: false
+    t.boolean :city,         default: false
     t.string  :income_class
     t.string  :urban_rural
     t.string  :district
     t.string  :longitude
     t.string  :latitude
-    t.timestamps default: Time.now
+    t.timestamps null: false
   end
 
   create_table :pilipinas_barangays, force: true do |t|
@@ -48,25 +51,25 @@ ActiveRecord::Schema.define do
     t.string  :code
     t.string  :name
     t.string  :urban_rural
-    t.timestamps default: Time.now
+    t.timestamps null: false
   end
 
-  add_index :pilipinas_regions, :location_id, unique: true
-  add_index :pilipinas_regions, :code
-  add_index :pilipinas_regions, :rgt
+  add_index :pilipinas_regions,   :location_id, unique: true
+  add_index :pilipinas_regions,   :code,        unique: true
+  add_index :pilipinas_regions,   %i[lft rgt],  name: 'idx_pilipinas_regions_lft_rgt'
 
   add_index :pilipinas_provinces, :location_id, unique: true
-  add_index :pilipinas_provinces, :code
+  add_index :pilipinas_provinces, :code,        unique: true
   add_index :pilipinas_provinces, :parent_id
-  add_index :pilipinas_provinces, :rgt
+  add_index :pilipinas_provinces, %i[lft rgt],  name: 'idx_pilipinas_provinces_lft_rgt'
 
-  add_index :pilipinas_cities, :location_id, unique: true
-  add_index :pilipinas_cities, :code
-  add_index :pilipinas_cities, :parent_id
-  add_index :pilipinas_cities, :rgt
+  add_index :pilipinas_cities,    :location_id, unique: true
+  add_index :pilipinas_cities,    :code,        unique: true
+  add_index :pilipinas_cities,    :parent_id
+  add_index :pilipinas_cities,    %i[lft rgt],  name: 'idx_pilipinas_cities_lft_rgt'
 
   add_index :pilipinas_barangays, :location_id, unique: true
-  add_index :pilipinas_barangays, :code
+  add_index :pilipinas_barangays, :code,        unique: true
   add_index :pilipinas_barangays, :parent_id
-  add_index :pilipinas_barangays, :rgt
+  add_index :pilipinas_barangays, %i[lft rgt],  name: 'idx_pilipinas_barangays_lft_rgt'
 end

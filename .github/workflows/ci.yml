@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─── Test suite ────────────────────────────────────────────────────────────
+  test:
+    name: "Ruby ${{ matrix.ruby }} / ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ruby:
+          - "3.4"
+          - "4.0"
+        include:
+          - os: macos-latest
+            ruby: "3.4"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true   # runs `bundle install` and caches automatically
+
+      - name: Run test suite
+        run: bundle exec rake spec
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        if: matrix.ruby == '3.4' && matrix.os == 'ubuntu-latest'
+        with:
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  # ─── Static analysis ───────────────────────────────────────────────────────
+  # lint:
+  #   name: "RuboCop"
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up Ruby
+  #       uses: ruby/setup-ruby@v1
+  #       with:
+  #         ruby-version: "4.0.3"
+  #         bundler-cache: true
+
+  #     - name: Run RuboCop
+  #       run: bundle exec rubocop --parallel --format github
+
+  # ─── Gem build smoke-test ──────────────────────────────────────────────────
+  build:
+    name: "Gem build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Build gem
+        run: gem build pilipinas.gemspec
+
+      - name: Install built gem
+        run: gem install pilipinas-*.gem --no-document

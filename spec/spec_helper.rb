@@ -1,35 +1,41 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
-require 'byebug'
-require 'pilipinas'
 require 'simplecov'
 require 'simplecov-console'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
+  [SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::Console]
+)
+SimpleCov.start do
+  add_filter '/spec/'
+  enable_coverage :branch
+end
+
+require 'pilipinas'
 require 'shoulda-matchers'
 require 'active_record'
 
-SimpleCov.start
-
 RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  # Ensure the in-process data cache is clean between examples.
+  config.before { Pilipinas::Cache.clear }
 end
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
-
-    # Keep as many of these lines as are necessary:
     with.library :active_record
     with.library :active_model
   end
 end
 
-ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 
-load File.dirname(__FILE__) + '/schema.rb'
+load File.join(__dir__, 'schema.rb')
