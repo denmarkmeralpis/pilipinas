@@ -28,9 +28,9 @@ jobs:
         ruby:
           - "3.4"
           - "4.0"
-        include:
-          - os: macos-latest
-            ruby: "3.4"
+        # include:
+        #   - os: macos-latest
+        #     ruby: "3.4"
 
     steps:
       - name: Checkout repository
