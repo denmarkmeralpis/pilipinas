@@ -25,10 +25,14 @@ module Pilipinas
       #
       # == Optimizations applied
       #
-      # * +readonly?+ returns +true+ for persisted records only — accidental
+      # * +readonly?+ returns +true+ for persisted records when
+      #   +enforce_readonly+ is +true+ (the default) — accidental
       #   +update!/save!/destroy+ on fetched rows raise
       #   +ActiveRecord::ReadOnlyRecord+; new records stay writable so the
       #   Loader and test fixtures can still call +create!+.
+      # * +enforce_readonly+ class attribute: opt a subclass out of the
+      #   read-only guard without touching production models — useful in test
+      #   environments where factories need to write to pilipinas tables.
       # * +self.inheritance_column = :_sti_disabled+: removes STI type-column
       #   look-up from every query.
       # * +.lite+ scope: selects only +id+, +location_id+, +code+, +name+ —
@@ -50,6 +54,11 @@ module Pilipinas
       #   province.cities    # SELECT id, location_id, parent_id, code, name …
       #   city.barangays     # SELECT id, location_id, parent_id, code, name …
       #
+      # @example Opting a subclass out of read-only enforcement (e.g. in tests)
+      #   class Locations::Barangay < Pilipinas::Db::Barangay
+      #     self.enforce_readonly = false
+      #   end
+      #
       module StaticRecord
         extend ActiveSupport::Concern
 
@@ -63,6 +72,16 @@ module Pilipinas
           # ── Disable STI ──────────────────────────────────────────────────
           # Removes the hidden "type" column check AR performs on every query.
           self.inheritance_column = :_sti_disabled
+
+          # ── Read-only enforcement ─────────────────────────────────────────
+          # Defaults to +true+.  Set to +false+ on a subclass (e.g. in a test
+          # environment or for a model that legitimately needs write access)
+          # without touching production behaviour:
+          #
+          #   class Locations::Barangay < Pilipinas::Db::Barangay
+          #     self.enforce_readonly = false
+          #   end
+          class_attribute :enforce_readonly, instance_writer: false, default: true
 
           # ── Memory-efficient query scopes ─────────────────────────────────
 
@@ -97,19 +116,25 @@ module Pilipinas
           scope :find_lite_by_name, ->(name) { lite.by_name(name).first }
         end
 
-        # Persisted instances loaded from a pilipinas_* table are permanently
-        # read-only: +update!+, +save+, and +destroy+ all raise
-        # +ActiveRecord::ReadOnlyRecord+.  New (unsaved) objects are writable
-        # so that the Loader can still call +create!+ on the fallback path and
-        # so that specs can build fixtures with +create!+.
+        # Guards against accidental writes to static reference data.
+        #
+        # Returns +true+ (making the record read-only) when both conditions hold:
+        # 1. The record is persisted (+new_record?+ is +false+).
+        # 2. The class-level +enforce_readonly+ flag is +true+ (the default).
+        #
+        # New (unsaved) objects are always writable so the Loader and test
+        # factories can call +create!+.  To allow writes on a subclass — for
+        # example in a test environment — set:
+        #
+        #   self.enforce_readonly = false
         #
         # Overriding +readonly?+ is more efficient than an +after_initialize+
-        # callback because it is only called when AR is about to perform a
-        # write operation — it adds zero per-record overhead on reads.
+        # callback: it is only invoked when AR is about to perform a write
+        # operation, so it adds zero overhead on read paths.
         #
-        # @return [Boolean] +true+ for persisted records, +false+ for new ones
+        # @return [Boolean]
         def readonly?
-          !new_record?
+          self.class.enforce_readonly && !new_record?
         end
       end
     end

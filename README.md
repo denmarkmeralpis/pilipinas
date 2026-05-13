@@ -18,6 +18,8 @@ Region  →  Province  →  City / Municipality  →  Barangay
 - **O(1) look-ups** — separate hash indices keyed by code and by name; no linear scans.
 - **Immutable value objects** — every entity instance is frozen. Safe to share across threads and fibers without copying.
 - **Optional ActiveRecord integration** — a migration generator and Rake task seed the four `pilipinas_*` tables from the bundled YAML data.
+- **Read-only by default** — persisted AR model instances raise `ActiveRecord::ReadOnlyRecord` on accidental writes; opt out per-class via `enforce_readonly = false`.
+- **Test helper included** — `require 'pilipinas/testing/rspec'` disables the read-only guard for the entire RSpec suite with one line.
 - **Ruby ≥ 3.4** required; developed against Ruby 4.0.
 
 ---
@@ -183,6 +185,48 @@ province.cities          # has_many association
 ```
 
 > **Note:** The AR models are auto-loaded and require `activerecord` to be available.
+
+### Read-only behaviour
+
+All four `Pilipinas::Db::*` models are **read-only by default**. Any attempt to call `update!`, `save`, or `destroy` on a persisted record raises `ActiveRecord::ReadOnlyRecord`. This is intentional — the pilipinas tables are static reference data that should never be mutated after seeding.
+
+New (unsaved) records are always writable, so `create!` works normally in the Loader and in test factories.
+
+#### Opting a subclass out of read-only enforcement
+
+If your application inherits from a Pilipinas DB model and legitimately needs write access, set `enforce_readonly` to `false` on the subclass:
+
+```ruby
+class Locations::Barangay < Pilipinas::Db::Barangay
+  self.enforce_readonly = false
+end
+```
+
+This does not affect the parent class or any other model.
+
+---
+
+## Testing
+
+The gem ships a ready-made RSpec helper that turns off the read-only guard for the entire test suite — no stubbing required.
+
+```ruby
+# spec/rails_helper.rb  (or spec/support/pilipinas.rb)
+require 'pilipinas/testing/rspec'
+```
+
+This sets `enforce_readonly = false` on all four models (`Region`, `Province`, `City`, `Barangay`) inside a `before(:suite)` hook, so FactoryBot factories, fixtures, and any spec that writes to pilipinas tables work without extra setup.
+
+If you only need writable records in a specific context:
+
+```ruby
+around do |example|
+  Locations::Barangay.enforce_readonly = false
+  example.run
+ensure
+  Locations::Barangay.enforce_readonly = true
+end
+```
 
 ---
 
