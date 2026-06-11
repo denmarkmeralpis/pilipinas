@@ -73,7 +73,17 @@ module Pilipinas
       # @return [void]
       def bulk_insert(model, batch)
         if model.respond_to?(:upsert_all)
-          model.upsert_all(batch, unique_by: :code)
+          begin
+            model.upsert_all(batch, unique_by: :code)
+          rescue ArgumentError
+            raise Pilipinas::Error,
+                  "pilipinas:load requires a unique index on the `code` column, " \
+                  "which is missing from #{model.table_name}. " \
+                  "Your database was likely created with an older version of the gem. " \
+                  "Run the following to add the missing indexes and retry:\n\n" \
+                  "  rails generate pilipinas:code_indexes\n" \
+                  "  rails db:migrate\n"
+          end
         elsif model.respond_to?(:insert_all)
           model.insert_all(batch)
         else

@@ -174,6 +174,20 @@ This creates four tables: `pilipinas_regions`, `pilipinas_provinces`, `pilipinas
 rake pilipinas:load
 ```
 
+> **Upgrading from an older version?**
+>
+> If `rake pilipinas:load` raises
+> `Pilipinas::Error: pilipinas:load requires a unique index on the code column`,
+> your database was created with an earlier migration that did not include those
+> indexes. Add them with the dedicated generator:
+>
+> ```sh
+> rails generate pilipinas:code_indexes
+> rails db:migrate
+> ```
+>
+> Then re-run `rake pilipinas:load`.
+
 ### 3. Use the AR models
 
 ```ruby
