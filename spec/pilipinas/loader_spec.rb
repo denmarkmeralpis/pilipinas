@@ -63,6 +63,38 @@ RSpec.describe Pilipinas::Loader do
       Pilipinas::Loader.send(:seed, Pilipinas::Db::Region, 'regions.yml')
       expect(Pilipinas::Db::Region.count).to eq(0)
     end
+
+    it 'inserts transformed records from a legacy YAML file' do
+      records = [{ code: 'TEST', name: 'Test Region' }]
+
+      allow(Psych).to receive(:load_file).and_return(records)
+      expect(Pilipinas::Loader).to receive(:bulk_insert) do |model, batch|
+        expect(model).to eq(Pilipinas::Db::Region)
+        expect(batch).to contain_exactly(
+          include('code' => 'TEST', 'name' => 'Test Region', 'created_at' => be_a(Time), 'updated_at' => be_a(Time))
+        )
+      end
+
+      Pilipinas::Loader.send(:seed, Pilipinas::Db::Region, 'regions.yml')
+    end
+  end
+
+  describe '.seed_full_data (private)' do
+    it 'does not perform an extra insert when the final batch is empty' do
+      column_indexes = { 'type' => 0, 'code' => 1, 'name' => 2 }
+      records = Array.new(described_class.const_get(:BATCH_SIZE)) { ['Locations::Region', 'TEST', 'Test Region'] }
+
+      expect(Pilipinas::Loader).to receive(:bulk_insert).once
+
+      Pilipinas::Loader.send(
+        :seed_full_data,
+        Pilipinas::Db::Region,
+        records,
+        column_indexes,
+        'Locations::Region',
+        %w[code name]
+      )
+    end
   end
 
   describe '.bulk_insert (private)' do
