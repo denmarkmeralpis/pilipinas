@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2026-06-11
+
+### Added
+
+- `rails generate pilipinas:code_indexes` — new migration generator that adds
+  `UNIQUE` indexes on the `code` column to all four `pilipinas_*` tables.
+  Run this if your database was created with a pre-1.0 migration and
+  `rake pilipinas:load` raises `ArgumentError: No unique index found for code`.
+
+### Fixed
+
+- `Loader.bulk_insert` now rescues the bare `ArgumentError` raised by
+  `upsert_all` when the unique index on `code` is absent, and re-raises it as
+  a descriptive `Pilipinas::Error` that tells the user exactly which commands
+  to run (`rails generate pilipinas:code_indexes && rails db:migrate`).
+  Previously the error surfaced as an unguided `ArgumentError` from deep inside
+  ActiveRecord.
+
+---
+
 ## [1.1.0] - 2026-05-13
 
 ### Added
