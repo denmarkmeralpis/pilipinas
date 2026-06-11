@@ -47,6 +47,7 @@ module Pilipinas
         ActiveRecord::Base.transaction do
           FULL_DATA_SEEDS.each do |model_name, type, attributes|
             model = Db.const_get(model_name)
+            delete_stale_compact_rows(model)
             seed_full_data(model, records, column_indexes, type, attributes)
           end
         end
@@ -104,6 +105,17 @@ module Pilipinas
       def full_data_attributes(record, attribute_indexes, now)
         attribute_indexes.to_h { |attribute, index| [attribute, record[index]] }
                          .merge('created_at' => now, 'updated_at' => now)
+      end
+
+      # Older loader versions seeded compact file-backed rows with only +code+
+      # and +name+. Those rows cannot be upserted into the full-data records
+      # because their +code+ values differ from the PSA codes in
+      # +pilipinas_data.yml+, so remove them before inserting the canonical set.
+      #
+      # @param model [Class] ActiveRecord model class
+      # @return [void]
+      def delete_stale_compact_rows(model)
+        model.where(location_id: nil).delete_all
       end
 
       # Insert or update rows for one table from a YAML file.

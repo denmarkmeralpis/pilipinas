@@ -20,6 +20,22 @@ RSpec.describe Pilipinas::Loader do
       expect(Pilipinas::Db::Barangay.count).to be > 0
     end
 
+    it 'removes stale compact rows from earlier loader versions' do
+      Pilipinas::Db::Region.create!(code: '1', name: 'NCR - National Capital Region')
+      Pilipinas::Db::Province.create!(code: '2', name: 'NCR, CITY OF MANILA, FIRST DISTRICT')
+      Pilipinas::Db::City.create!(code: '3', name: 'CITY OF MANILA')
+      Pilipinas::Db::Barangay.create!(code: '5', name: 'Barangay 1')
+
+      Pilipinas::Loader.run
+
+      expect(Pilipinas::Db::Region.where(location_id: nil).count).to eq(0)
+      expect(Pilipinas::Db::Province.where(location_id: nil).count).to eq(0)
+      expect(Pilipinas::Db::City.where(location_id: nil).count).to eq(0)
+      expect(Pilipinas::Db::Barangay.where(location_id: nil).count).to eq(0)
+      expect(Pilipinas::Db::Province.find_by(code: '2')).to be_nil
+      expect(Pilipinas::Db::Province.find_by(location_id: 2)).to have_attributes(code: '133900000')
+    end
+
     it 'seeds complete attributes from the full data file' do
       Pilipinas::Loader.run
 
@@ -49,7 +65,7 @@ RSpec.describe Pilipinas::Loader do
       )
     end
 
-    it 'is idempotent – running twice yields the same region count' do
+    it 'is idempotent - running twice yields the same region count' do
       Pilipinas::Loader.run
       count = Pilipinas::Db::Region.count
       Pilipinas::Loader.run
