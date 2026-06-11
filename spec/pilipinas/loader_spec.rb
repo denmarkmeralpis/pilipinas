@@ -40,6 +40,35 @@ RSpec.describe Pilipinas::Loader do
     let(:now)   { Time.now.utc }
     let(:batch) { [{ 'code' => 'BTEST', 'name' => 'Bulk Test', 'created_at' => now, 'updated_at' => now }] }
 
+    context 'when upsert_all raises ArgumentError (unique index missing)' do
+      let(:model) do
+        Class.new do
+          def self.table_name = 'pilipinas_regions'
+          def self.upsert_all(_batch, **_opts) = raise(ArgumentError, 'No unique index found for code')
+        end
+      end
+
+      it 'raises Pilipinas::Error' do
+        expect { Pilipinas::Loader.send(:bulk_insert, model, batch) }
+          .to raise_error(Pilipinas::Error)
+      end
+
+      it 'includes the table name in the error message' do
+        expect { Pilipinas::Loader.send(:bulk_insert, model, batch) }
+          .to raise_error(Pilipinas::Error, /pilipinas_regions/)
+      end
+
+      it 'includes the generator command in the error message' do
+        expect { Pilipinas::Loader.send(:bulk_insert, model, batch) }
+          .to raise_error(Pilipinas::Error, /rails generate pilipinas:code_indexes/)
+      end
+
+      it 'includes the migrate command in the error message' do
+        expect { Pilipinas::Loader.send(:bulk_insert, model, batch) }
+          .to raise_error(Pilipinas::Error, /rails db:migrate/)
+      end
+    end
+
     context 'when model responds to insert_all but not upsert_all' do
       let(:model) do
         Class.new do
