@@ -86,11 +86,7 @@ module Pilipinas
         records.each do |record|
           next unless record[type_index] == type
 
-          batch << attribute_indexes.to_h do |attribute, index|
-            [attribute, record[index]]
-          end
-          batch.last['created_at'] = now
-          batch.last['updated_at'] = now
+          batch << full_data_attributes(record, attribute_indexes, now)
 
           next if batch.size < BATCH_SIZE
 
@@ -98,9 +94,16 @@ module Pilipinas
           batch = []
         end
 
-        unless batch.empty?
-          bulk_insert(model, batch)
-        end
+        bulk_insert(model, batch) unless batch.empty?
+      end
+
+      # @param record            [Array] full location dump row
+      # @param attribute_indexes [Hash] destination attributes mapped to row indexes
+      # @param now               [Time] timestamp shared by the current table seed
+      # @return [Hash]
+      def full_data_attributes(record, attribute_indexes, now)
+        attribute_indexes.to_h { |attribute, index| [attribute, record[index]] }
+                         .merge('created_at' => now, 'updated_at' => now)
       end
 
       # Insert or update rows for one table from a YAML file.
