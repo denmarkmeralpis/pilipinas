@@ -20,6 +20,35 @@ RSpec.describe Pilipinas::Loader do
       expect(Pilipinas::Db::Barangay.count).to be > 0
     end
 
+    it 'seeds complete attributes from the full data file' do
+      Pilipinas::Loader.run
+
+      expect(Pilipinas::Db::Region.find_by(location_id: 1)).to have_attributes(
+        code: '130000000',
+        lft: 1,
+        rgt: 3484,
+        longitude: '121.0222565',
+        latitude: '14.6090537'
+      )
+      expect(Pilipinas::Db::Province.find_by(location_id: 2)).to have_attributes(
+        parent_id: 1,
+        code: '133900000'
+      )
+      expect(Pilipinas::Db::City.find_by(location_id: 4)).to have_attributes(
+        parent_id: 2,
+        code: '133901000',
+        city: true,
+        income_class: '-',
+        urban_rural: 'Urban',
+        district: '1st/2nd'
+      )
+      expect(Pilipinas::Db::Barangay.find_by(location_id: 5)).to have_attributes(
+        parent_id: 4,
+        code: '133901001',
+        urban_rural: 'Urban'
+      )
+    end
+
     it 'is idempotent – running twice yields the same region count' do
       Pilipinas::Loader.run
       count = Pilipinas::Db::Region.count

@@ -9,8 +9,9 @@ module Pilipinas
   # * **Idempotent** — uses +upsert_all+ (Rails 6.1+) so re-running the Rake
   #   task is safe.  Falls back to +insert_all+ (Rails 6.0) or individual
   #   +create!+ calls on older versions.
-  # * **Memory-efficient** — rows are inserted in batches of {BATCH_SIZE}
-  #   (default 500) so the process never holds a 42 k-row Array in memory.
+  # * **Memory-aware** — rows are transformed and inserted in batches of
+  #   {BATCH_SIZE} (default 500) so the process never holds a full
+  #   ActiveRecord insert payload in memory.
   # * **Atomic** — all four tables are seeded inside a single transaction; a
   #   failure rolls back everything, leaving no partial data.
   #
@@ -21,21 +22,86 @@ module Pilipinas
     # Number of rows inserted per SQL statement.
     # 500 balances SQL statement size against the number of round-trips.
     BATCH_SIZE = 500
+    FULL_DATA_FILE = 'pilipinas_data.yml'
+    LOCATION_TABLE = 'pilipinas_locations'
+
+    FULL_DATA_SEEDS = [
+      ['Region', 'Locations::Region', %w[location_id lft rgt code name longitude latitude]],
+      ['Province', 'Locations::Province', %w[location_id parent_id lft rgt code name longitude latitude]],
+      [
+        'City',
+        'Locations::Town',
+        %w[location_id parent_id lft rgt code name city income_class urban_rural district longitude latitude]
+      ],
+      ['Barangay', 'Locations::Barangay', %w[location_id parent_id lft rgt code name urban_rural]]
+    ].freeze
+    private_constant :FULL_DATA_FILE, :LOCATION_TABLE, :FULL_DATA_SEEDS
 
     class << self
       # Seed all four geographic tables inside a single transaction.
       #
       # @return [void]
       def run
+        column_indexes, records = full_location_table
+
         ActiveRecord::Base.transaction do
-          seed(Db::Region,   'regions.yml')
-          seed(Db::Province, 'provinces.yml')
-          seed(Db::City,     'cities.yml')
-          seed(Db::Barangay, 'barangays.yml')
+          FULL_DATA_SEEDS.each do |model_name, type, attributes|
+            model = Db.const_get(model_name)
+            seed_full_data(model, records, column_indexes, type, attributes)
+          end
         end
       end
 
       private
+
+      # Load the full Rails fixture-style location dump bundled with the gem.
+      #
+      # The older per-table YAML files only contain +code+ and +name+ for the
+      # file-backed API.  Database seeding needs the complete dump so lft/rgt,
+      # parent links, coordinates, and classification fields are populated.
+      #
+      # @return [Array(Hash, Array<Array>)]
+      def full_location_table
+        data = Psych.load_file(File.join(DATA_DIR, FULL_DATA_FILE)) || {}
+        table = data.fetch(LOCATION_TABLE)
+        columns = table.fetch('columns').map(&:to_s)
+
+        [columns.each_with_index.to_h, table.fetch('records')]
+      end
+
+      # Insert or update rows for one split table from the full location dump.
+      #
+      # @param model          [Class] ActiveRecord model class
+      # @param records        [Array<Array>] full location dump rows
+      # @param column_indexes [Hash] source column names mapped to row indexes
+      # @param type           [String] source STI type to select
+      # @param attributes     [Array<String>] destination table attributes
+      # @return [void]
+      def seed_full_data(model, records, column_indexes, type, attributes)
+        type_index = column_indexes.fetch('type')
+        attribute_indexes = attributes.to_h { |attribute| [attribute, column_indexes.fetch(attribute)] }
+        now = timestamp
+        batch = []
+
+        records.each do |record|
+          next unless record[type_index] == type
+
+          batch << attribute_indexes.to_h do |attribute, index|
+            [attribute, record[index]]
+          end
+          batch.last['created_at'] = now
+          batch.last['updated_at'] = now
+
+          next if batch.size < BATCH_SIZE
+
+          bulk_insert(model, batch)
+          batch = []
+        end
+
+        unless batch.empty?
+          bulk_insert(model, batch)
+        end
+      end
 
       # Insert or update rows for one table from a YAML file.
       #
