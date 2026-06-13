@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.3] - 2026-06-13
+
+### Fixed
+
+- `rake pilipinas:load` now upserts ActiveRecord seed rows by `location_id` instead of `code`, matching the stable identifier from `lib/data/pilipinas_data.yml`.
+- `rails generate pilipinas:code_indexes` now generates a migration that adds unique `location_id` indexes to all four `pilipinas_*` tables, matching the loader's upsert conflict target.
+
+### Changed
+
+- Updated loader upgrade guidance and README wording to reference the required `location_id` unique indexes.
+
+### Tests
+
+- Added regression coverage that asserts `Loader.bulk_insert` uses `location_id` as the `upsert_all` unique key and reports the matching missing-index guidance.
+
+---
+
 ## [1.1.2] - 2026-06-12
 
 ### Fixed

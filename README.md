@@ -177,7 +177,7 @@ rake pilipinas:load
 > **Upgrading from an older version?**
 >
 > If `rake pilipinas:load` raises
-> `Pilipinas::Error: pilipinas:load requires a unique index on the code column`,
+> `Pilipinas::Error: pilipinas:load requires a unique index on the location_id column`,
 > your database was created with an earlier migration that did not include those
 > indexes. Add them with the dedicated generator:
 >

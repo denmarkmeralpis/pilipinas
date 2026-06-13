@@ -4,13 +4,13 @@ require 'rails/generators/base'
 require 'rails/generators/active_record'
 
 module Pilipinas
-  # Rails generator that adds unique indexes on the +code+ column to all four
-  # pilipinas_* tables.
+  # Rails generator that adds unique indexes on the +location_id+ column to all
+  # four pilipinas_* tables.
   #
   # Run this if your database was created with an older version of the gem
   # that did not include these indexes, and +rake pilipinas:load+ raises:
   #
-  #   ArgumentError: No unique index found for code
+  #   ArgumentError: No unique index found for location_id
   #
   # @example
   #   rails generate pilipinas:code_indexes
@@ -23,7 +23,7 @@ module Pilipinas
 
     def generate_migration
       migration_template 'templates/add_pilipinas_code_indexes.rb',
-                         'db/migrate/add_pilipinas_code_indexes.rb'
+                         'db/migrate/add_pilipinas_location_id_indexes.rb'
     end
 
     # @param _dir [String] unused (required by the interface)

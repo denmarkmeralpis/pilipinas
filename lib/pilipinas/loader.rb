@@ -141,10 +141,10 @@ module Pilipinas
       # Perform the most capable bulk-insert available for this AR version.
       #
       # +upsert_all+ (Rails 6.1+) is idempotent — it updates existing rows
-      # matched by the unique index on +code+, which is present in every YAML
-      # record.  Using +code+ (not +location_id+) as the conflict column is
-      # essential because +location_id+ is nullable and NULL != NULL in SQL —
-      # a unique index on a nullable column cannot reliably detect conflicts.
+      # matched by the unique index on +location_id+, the stable identifier in
+      # the full location dump. Compact rows from older loader versions have a
+      # NULL +location_id+ and are deleted before the canonical full-data rows
+      # are inserted.
       #
       # +insert_all+ (Rails 6.0) silently skips conflicts.
       # Legacy path: individual +create!+ calls (raises on conflict).
@@ -155,10 +155,10 @@ module Pilipinas
       def bulk_insert(model, batch)
         if model.respond_to?(:upsert_all)
           begin
-            model.upsert_all(batch, unique_by: :code)
+            model.upsert_all(batch, unique_by: :location_id)
           rescue ArgumentError
             raise Pilipinas::Error,
-                  'pilipinas:load requires a unique index on the `code` column, ' \
+                  'pilipinas:load requires a unique index on the `location_id` column, ' \
                   "which is missing from #{model.table_name}. " \
                   'Your database was likely created with an older version of the gem. ' \
                   "Run the following to add the missing indexes and retry:\n\n  " \

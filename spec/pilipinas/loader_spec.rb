@@ -115,13 +115,28 @@ RSpec.describe Pilipinas::Loader do
 
   describe '.bulk_insert (private)' do
     let(:now)   { Time.now.utc }
-    let(:batch) { [{ 'code' => 'BTEST', 'name' => 'Bulk Test', 'created_at' => now, 'updated_at' => now }] }
+    let(:batch) do
+      [{ 'location_id' => 1, 'code' => 'BTEST', 'name' => 'Bulk Test', 'created_at' => now, 'updated_at' => now }]
+    end
+
+    context 'when model responds to upsert_all' do
+      let(:model) do
+        Class.new do
+          def self.upsert_all(_batch, **_opts) = nil
+        end
+      end
+
+      it 'uses location_id as the unique key' do
+        expect(model).to receive(:upsert_all).with(batch, unique_by: :location_id)
+        Pilipinas::Loader.send(:bulk_insert, model, batch)
+      end
+    end
 
     context 'when upsert_all raises ArgumentError (unique index missing)' do
       let(:model) do
         Class.new do
           def self.table_name = 'pilipinas_regions'
-          def self.upsert_all(_batch, **_opts) = raise(ArgumentError, 'No unique index found for code')
+          def self.upsert_all(_batch, **_opts) = raise(ArgumentError, 'No unique index found for location_id')
         end
       end
 
@@ -133,6 +148,11 @@ RSpec.describe Pilipinas::Loader do
       it 'includes the table name in the error message' do
         expect { Pilipinas::Loader.send(:bulk_insert, model, batch) }
           .to raise_error(Pilipinas::Error, /pilipinas_regions/)
+      end
+
+      it 'mentions the location_id index in the error message' do
+        expect { Pilipinas::Loader.send(:bulk_insert, model, batch) }
+          .to raise_error(Pilipinas::Error, /unique index on the `location_id` column/)
       end
 
       it 'includes the generator command in the error message' do
