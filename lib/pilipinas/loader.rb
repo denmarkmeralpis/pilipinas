@@ -42,15 +42,21 @@ module Pilipinas
       #
       # @return [void]
       def run
+        records = nil
         column_indexes, records = full_location_table
 
-        ActiveRecord::Base.transaction do
-          FULL_DATA_SEEDS.each do |model_name, type, attributes|
-            model = Db.const_get(model_name)
-            delete_stale_compact_rows(model)
-            seed_full_data(model, records, column_indexes, type, attributes)
+        ActiveRecord::Base.uncached do
+          ActiveRecord::Base.transaction do
+            FULL_DATA_SEEDS.each do |model_name, type, attributes|
+              model = Db.const_get(model_name)
+              delete_stale_compact_rows(model)
+              seed_full_data(model, records, column_indexes, type, attributes)
+            end
           end
         end
+      ensure
+        records&.clear
+        clear_query_cache
       end
 
       private
@@ -92,10 +98,11 @@ module Pilipinas
           next if batch.size < BATCH_SIZE
 
           bulk_insert(model, batch)
-          batch = []
+          batch.clear
         end
 
         bulk_insert(model, batch) unless batch.empty?
+        batch.clear
       end
 
       # @param record            [Array] full location dump row
@@ -135,6 +142,7 @@ module Pilipinas
         records.each_slice(BATCH_SIZE) do |slice|
           batch = slice.map { |r| r.transform_keys(&:to_s).merge('created_at' => now, 'updated_at' => now) }
           bulk_insert(model, batch)
+          batch.clear
         end
       end
 
@@ -170,6 +178,17 @@ module Pilipinas
         else
           batch.each { |attrs| model.unscoped.create!(attrs) }
         end
+      ensure
+        clear_query_cache
+      end
+
+      # Clear any per-connection query-cache state so a long-running Rails
+      # process does not retain loader queries or bind values between batches.
+      #
+      # @return [void]
+      def clear_query_cache
+        connection = ActiveRecord::Base.connection
+        connection.clear_query_cache if connection.respond_to?(:clear_query_cache)
       end
 
       # @return [Time] current UTC time, compatible with or without ActiveSupport

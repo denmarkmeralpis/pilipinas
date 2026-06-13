@@ -71,6 +71,14 @@ RSpec.describe Pilipinas::Loader do
       Pilipinas::Loader.run
       expect(Pilipinas::Db::Region.count).to eq(count)
     end
+
+    it 'runs without retaining ActiveRecord query-cache entries' do
+      expect(ActiveRecord::Base).to receive(:uncached).and_yield
+
+      Pilipinas::Loader.run
+
+      expect(Pilipinas::Db::Region.count).to be > 0
+    end
   end
 
   describe '.seed (private)' do
@@ -128,6 +136,15 @@ RSpec.describe Pilipinas::Loader do
 
       it 'uses location_id as the unique key' do
         expect(model).to receive(:upsert_all).with(batch, unique_by: :location_id)
+        Pilipinas::Loader.send(:bulk_insert, model, batch)
+      end
+
+      it 'clears the ActiveRecord query cache after each batch' do
+        connection = instance_double(ActiveRecord::ConnectionAdapters::AbstractAdapter, clear_query_cache: nil)
+
+        allow(ActiveRecord::Base).to receive(:connection).and_return(connection)
+        expect(connection).to receive(:clear_query_cache)
+
         Pilipinas::Loader.send(:bulk_insert, model, batch)
       end
     end
