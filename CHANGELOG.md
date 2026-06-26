@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.4] - 2026-06-26
+
+### Changed
+
+- `rake pilipinas:load` now wraps the entire seed transaction in `ActiveRecord::Base.uncached` so a long-running Rails process cannot serve stale query-cache hits during seeding.
+- `Loader` clears the per-connection query cache after every `bulk_insert` batch and in the `run` `ensure` block, preventing cached bind-values from accumulating across batches.
+- Batch arrays are now cleared in-place (`batch.clear`) instead of being replaced by a new object, allowing Ruby's GC to reclaim the memory sooner.
+- The full location records table is released in `run`'s `ensure` block so memory is freed even if an exception interrupts seeding.
+
+### Dependencies
+
+- Updated `json` to 2.19.9.
+
+---
+
 ## [1.1.3] - 2026-06-13
 
 ### Fixed
@@ -111,6 +126,8 @@ Complete rewrite of the gem. Zero runtime dependencies.
 - Rails generator for migrations.
 - Railtie for automatic Rake task loading in Rails apps.
 
+[1.1.4]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.3...v1.1.4
+[1.1.3]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.0.0...v1.1.0
