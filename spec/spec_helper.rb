@@ -3,9 +3,14 @@
 require 'bundler/setup'
 require 'simplecov'
 require 'simplecov-console'
+require 'simplecov-lcov'
+
+SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
-  [SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::Console]
+  [SimpleCov::Formatter::HTMLFormatter,
+   SimpleCov::Formatter::Console,
+   SimpleCov::Formatter::LcovFormatter]
 )
 SimpleCov.start do
   add_filter '/spec/'

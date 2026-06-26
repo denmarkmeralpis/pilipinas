@@ -53,6 +53,7 @@ jobs:
         with:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov/pilipinas.lcov
 
   # ─── Static analysis ───────────────────────────────────────────────────────
   # lint:
