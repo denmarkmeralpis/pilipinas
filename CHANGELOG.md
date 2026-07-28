@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.5] - 2026-07-28
+
+### Changed
+
+- CI workflow now uses `actions/checkout@v7` and `codecov/codecov-action@v7`.
+- CI now generates an LCOV coverage report (`coverage/lcov/pilipinas.lcov`) via `simplecov-lcov` and uploads it to Codecov alongside the existing HTML/console formatters.
+
+### Dependencies
+
+- Updated `concurrent-ruby` to 1.3.8, `erb` to 6.0.6, `json` to 2.21.1, `loofah` to 2.25.2, `parser` to 3.3.12.0, `rbs` to 4.1.0, `rubocop` to 1.88.2, `rubocop-ast` to 1.50.0, `language_server-protocol` to 3.17.0.6, and `rails-html-sanitizer` to 1.7.1.
+- Removed unused transitive dependencies (`date`, `psych`, `stringio`) no longer required by `rdoc`.
+
+---
+
 ## [1.1.4] - 2026-06-26
 
 ### Changed
@@ -126,6 +140,7 @@ Complete rewrite of the gem. Zero runtime dependencies.
 - Rails generator for migrations.
 - Railtie for automatic Rake task loading in Rails apps.
 
+[1.1.5]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.1...v1.1.2
