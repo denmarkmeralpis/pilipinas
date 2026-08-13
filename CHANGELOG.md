@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.6] - 2026-08-13
+
+### Dependencies
+
+- Updated Rails components (`actionpack`, `actionview`, `activemodel`, `activerecord`, `activesupport`, `railties`) to 8.1.3.1.
+- Updated `erb` to 6.0.7, `io-console` to 0.9.2, `json` to 2.21.2, `rack` to 3.2.7, `rbs` to 4.1.3, `reline` to 0.7.0, `rubocop` to 1.89.0, `sqlite3` to 2.9.6, and `zeitwerk` to 2.8.3.
+
+---
+
 ## [1.1.5] - 2026-07-28
 
 ### Changed
@@ -140,6 +149,7 @@ Complete rewrite of the gem. Zero runtime dependencies.
 - Rails generator for migrations.
 - Railtie for automatic Rake task loading in Rails apps.
 
+[1.1.6]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.2...v1.1.3
