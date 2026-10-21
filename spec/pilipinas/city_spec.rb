@@ -10,8 +10,8 @@ RSpec.describe Pilipinas::City do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 1648 cities/municipalities' do
-      expect(klass.all.count).to eq(1648)
+    it 'returns 1656 city, municipality and district entries' do
+      expect(klass.all.count).to eq(1656)
     end
   end
 
@@ -33,12 +33,12 @@ RSpec.describe Pilipinas::City do
 
   describe '.find_by_name' do
     it 'finds a city by name' do
-      expect(klass.find_by_name('NAGA CITY')).to be_a(described_class)
+      expect(klass.find_by_name('City of Naga')).to be_a(described_class)
     end
 
     it 'is case-insensitive' do
-      lower = klass.find_by_name('naga city')
-      upper = klass.find_by_name('NAGA CITY')
+      lower = klass.find_by_name('city of naga')
+      upper = klass.find_by_name('City of Naga')
       expect(lower).to eq(upper)
     end
   end
