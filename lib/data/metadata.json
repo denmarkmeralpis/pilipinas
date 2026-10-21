@@ -1,0 +1,55 @@
+{
+  "psgc": {
+    "publisher": "Philippine Statistics Authority",
+    "snapshot_date": "2026-09-30",
+    "release_date": "2026-10-12",
+    "retrieved_on": "2026-10-21",
+    "url": "https://psa.gov.ph/classification/psgc/node/1684084314",
+    "download_url": "https://psa.gov.ph/system/files/scd/PSGC-3Q-2026-Publication-Datafile.xlsx",
+    "file": "PSGC-3Q-2026-Publication-Datafile.xlsx",
+    "license": "CC BY 4.0; workbook requires acknowledgement of PSA"
+  },
+  "postal": {
+    "publisher": "Philippine Postal Corporation (PHLPost)",
+    "publication_date": null,
+    "retrieved_on": "2026-10-21",
+    "url": "https://phlpost.gov.ph/zip-code-locator/",
+    "file": "phlpost-2026-10-21.html",
+    "row_count": 960,
+    "note": "Locator does not state a publication or effective date. Source labels and four-digit ZIPs retained; no inferred barangay coverage.",
+    "license_notice": "Captured page: All content is in the public domain unless otherwise stated. Copyright © 2026 Philippine Postal Corporation."
+  },
+  "files": [
+    {
+      "file": "PSGC-3Q-2026-National-and-Provincial-Summary.xlsx",
+      "sha256": "c5d8221aee26e1f561dbf8336aefc0721a36eca0d075cde90f1603d22064c895"
+    },
+    {
+      "file": "PSGC-3Q-2026-Publication-Datafile.xlsx",
+      "sha256": "8aad47f84e4f6317dc4222b9fe35d36b5d71f2b74ad8f0c7622289c131dc9a59"
+    },
+    {
+      "file": "legacy-compact.json",
+      "sha256": "c8d9fb5c9a1f073985f39ddef9523e8dc2a77e1b4b08dac4653e66eed0abc1f4"
+    },
+    {
+      "file": "phlpost-2026-10-21.html",
+      "sha256": "4c9dfab2383c6f683098fa2153548eda49966abee80f98903f434b05d527959d"
+    }
+  ],
+  "counts": {
+    "regions": 18,
+    "provinces": 82,
+    "cities": 1642,
+    "barangays": 42010,
+    "submunicipalities": 14,
+    "areas": 2
+  },
+  "postal_valid_rows": 959,
+  "postal_rejected_rows": 1,
+  "city_classes": {
+    "HUC": 33,
+    "CC": 111,
+    "ICC": 5
+  }
+}

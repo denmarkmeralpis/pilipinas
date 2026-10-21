@@ -1,313 +1,114 @@
 # Pilipinas
 
-[![CI](https://github.com/denmarkmeralpis/pilipinas/actions/workflows/ci.yml/badge.svg)](https://github.com/denmarkmeralpis/pilipinas/actions/workflows/ci.yml)
-[![Gem Version](https://badge.fury.io/rb/pilipinas.svg)](https://badge.fury.io/rb/pilipinas)
+[![CI](https://github.com/denmarkmeralpis/pilipinas/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/denmarkmeralpis/pilipinas/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A complete, read-only directory of Philippine geographic divisions:
+Local, read-only Philippine geography from the **PSA PSGC as of September 30, 2026**, released October 12, 2026. Separately sourced PHLPost postal lookup returns candidates and explicit missing or ambiguous results. No database, API key, HTTP request, or runtime gem dependency is required.
 
-```
-Region  →  Province  →  City / Municipality  →  Barangay
-(17)         (86)           (1,648)              (42,027)
-```
+| Geographic level | Snapshot total |
+| --- | ---: |
+| Regions | 18 |
+| Administrative provinces | 82 |
+| Cities | 149 |
+| Municipalities | 1,493 |
+| Barangays | 42,010 |
+| Manila sub-municipal districts (separate from municipalities) | 14 |
+| Non-province PSGC areas | 2 |
 
-## Features
-
-- **Zero runtime dependencies** — pure Ruby + stdlib Psych (ships with Ruby).
-- **Lazy-loaded & cached** — YAML is parsed once per class per process and held in a thread-safe, process-lifetime cache. Repeated calls are free.
-- **O(1) look-ups** — separate hash indices keyed by code and by name; no linear scans.
-- **Immutable value objects** — every entity instance is frozen. Safe to share across threads and fibers without copying.
-- **Optional ActiveRecord integration** — a migration generator and Rake task seed the four `pilipinas_*` tables from the bundled YAML data.
-- **Read-only by default** — persisted AR model instances raise `ActiveRecord::ReadOnlyRecord` on accidental writes; opt out per-class via `enforce_readonly = false`.
-- **Test helper included** — `require 'pilipinas/testing/rspec'` disables the read-only guard for the entire RSpec suite with one line.
-- **Ruby ≥ 3.4** required; developed against Ruby 4.0.
-
----
+All counts reconcile to PSA's publication, including every regional summary. [Sources and data maintenance](docs/DATA.md), [2.0 upgrade guide](docs/UPGRADING.md), [consumer handoff](docs/CONSUMER.md).
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Ruby >= 3.4; tested on **Ruby 3.4.11**. Add the gem to your application's Gemfile:
 
 ```ruby
-gem "pilipinas"
+# Gemfile
+gem 'pilipinas'
 ```
 
-Then run:
+## Geography
+
+```ruby
+require 'pilipinas'
+
+Pilipinas::Region.all    # frozen canonical records
+Pilipinas::Region.count  # 18
+Pilipinas::Province.count # 82
+Pilipinas::City.count     # 1642: City and Mun levels combined
+Pilipinas::Barangay.count # 42010
+
+region = Pilipinas::Region.find_by_code('1400000000')
+province = region.provinces.find { |p| p.name == 'Abra' }
+town = province.cities.find { |c| c.name == 'Peñarrubia' }
+town.barangays
+barangay = town.barangays.first
+barangay.city      # canonical town object
+barangay.province  # Abra
+barangay.region    # CAR
+barangay.parent    # town, or a Submunicipality for Manila barangays
+```
+
+`code` is the official **ten-digit PSGC string**, including leading zeros. `correspondence_code` preserves the workbook's older nine-digit code where supplied. Never convert codes to integers. See the upgrade guide before replacing the old gem's internal IDs.
+
+Every class supports `all`, `count`, `first`, `last`, `where`, `find_by`, `find_by_code` and `find_by_name`. Name matching ignores case, preserves accents and does not invent aliases. `where` returns every match; `find_by` returns `nil` for none and raises `Pilipinas::AmbiguousMatch` for several. Combine filters to disambiguate:
+
+```ruby
+Pilipinas::City.where(name: 'City of Naga') # two cities
+Pilipinas::City.find_by(name: 'City of Naga', region_code: '0500000000')
+Pilipinas::Barangay.where(name: 'Casay', city_code: '0501719000')
+```
+
+Supported attributes are listed in `Pilipinas::Base::ATTRIBUTES`, including `parent_code`, `region_code`, `province_code`, `city_code`, `submunicipality_code`, `area_code`, `level` and `city_class`. Invalid attributes raise `Pilipinas::UnknownAttribute`. `find_by({})` raises `ArgumentError`. Codes, names, objects, metadata, and returned collections are immutable. Parsed data and lookup indices are cached under a mutex; no files are written by queries. `Pilipinas::Cache.clear` clears only process memory.
+
+## NCR, independent cities and special areas
+
+`Region#cities` includes **all** cities and municipalities in a region. Iterating it and each city's `barangays` reaches every barangay exactly once, including those outside provincial administration.
+
+- NCR has **no provinces**. Its 16 cities and Pateros are directly available through `Region#cities` and `cities_without_province`.
+- `Province#cities` means administrative membership. HUC/ICC cities have `province_code == nil`; use `Region#cities` or `cities_without_province`. For ICC cities, `psgc_province_code` retains the workbook's statistical provincial code grouping without asserting administrative membership.
+- Manila's 14 `Submunicipality` records are districts, not municipalities. `manila.submunicipalities` preserves them. `manila.barangays` includes all 897 barangays, while each barangay retains its district `parent_code` and `submunicipality_code`.
+- `Area` represents the workbook's **Special Geographic Area** and **City of Isabela (Not a Province)**. Use `Region#areas`, `Area#cities`, and `City#area`. These are never included in `Province.all`. The SGA contains eight municipalities and 63 barangays.
+- Lucena follows PSA's HUC classification for statistical purposes. Its `note` preserves PSA's caveat about legal status. Its display name omits the attached `a/` footnote marker; `source_name` preserves the original.
+
+For a UI, either start with a region and select a city directly, or show provinces alongside a clearly labelled “Cities/municipalities without a province” option. Those UI groupings have no invented PSGC province identifiers.
+
+## PHLPost ZIP candidates
+
+```ruby
+result = Pilipinas::Postal.lookup(locality: 'Pandacan', province: 'Metro Manila')
+result.status      # :matched
+result.suggestion  # '1011'
+result.candidates  # frozen Entry objects: region, province, locality, zip_code
+
+result = Pilipinas::Postal.lookup(locality: 'Santa Maria')
+result.status      # :ambiguous
+result.zip_codes   # ['8011', '2440']
+result.suggestion  # nil
+
+Pilipinas::Postal.lookup(locality: 'Makati', province: 'Metro Manila').status # :missing
+Pilipinas::Postal.metadata # source URL, retrieval date; publication_date is nil
+```
+
+`locality:` is required. Optional `province:` and `region:` filters use the **PHLPost labels**, which can differ from PSGC names and current administrative regions. Only case and whitespace are normalized. There is no fuzzy match, automatic name conversion, PSGC-to-postal join, province default ZIP, or inferred barangay coverage. A single result identifies a source postal locality, not every address in a PSGC city.
+
+**Source coverage is incomplete:** the October 21, 2026 PHLPost locator capture contains 960 rows across 55 province labels, with 959 valid ZIP rows. It supplies only Pandacan under Metro Manila and no Makati entry. Missing results therefore mean the captured source cannot supply a match, not that the place lacks a ZIP. The malformed Cajidiocan row is retained in `result.rejected_rows` with its rejection reason; no replacement ZIP was guessed. Several candidates never produce a suggestion, even if their ZIPs happen to agree. Consumers should permit manual ZIP entry and overrides.
+
+## Legacy database integration
+
+The optional `Pilipinas::Db::*`, generators, Rake loader, and `pilipinas/testing/rspec` helper remain for compatibility. **They use the historical `lib/data/legacy/pilipinas_data.yml` dump, not the refreshed PSGC directory.** The old nested-set IDs, coordinates, and classifications have not been invented for the new snapshot. Use the file-backed classes above for current geography; no seed or migration is needed. `require 'pilipinas'` and all current lookups leave application databases untouched. `rake pilipinas:load` remains an explicit legacy database write operation.
+
+## Development
 
 ```sh
 bundle install
+bundle exec rake spec
+gem build pilipinas.gemspec
 ```
 
-Or install directly:
+CI runs the Ruby suite on Ruby 3.4.11 and 4.0 and checks the built gem. See [data maintenance](docs/DATA.md) before updating a snapshot. Bug reports and pull requests are welcome in the [project repository](https://github.com/denmarkmeralpis/pilipinas). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-```sh
-gem install pilipinas
-```
+## License and acknowledgements
 
----
+The software remains under the [MIT License](LICENSE), copyright (c) 2018 Nujian Den Mark Meralpis. Original project: [denmarkmeralpis/pilipinas](https://github.com/denmarkmeralpis/pilipinas). The historical data used in this gem is from `gem pinas`. Kudos!
 
-## Usage
-
-### Require
-
-```ruby
-require "pilipinas"
-```
-
-Rails applications load the gem automatically via Bundler.
-
----
-
-### Regions
-
-```ruby
-# All 17 regions (returns a frozen Array)
-Pilipinas::Region.all            # => [#<Region code="1" name="NCR…">, …]
-Pilipinas::Region.count          # => 17
-Pilipinas::Region.first          # => #<Region …>
-Pilipinas::Region.last           # => #<Region …>
-
-# Find by code (O(1), case-insensitive)
-Pilipinas::Region.find_by(code: "17744")
-Pilipinas::Region.find_by_code("17744")
-
-# Find by name (O(1), case-insensitive)
-Pilipinas::Region.find_by(name: "REGION V (Bicol Region)")
-Pilipinas::Region.find_by_name("region v (bicol region)")   # same result
-
-# Traverse down the hierarchy
-region = Pilipinas::Region.find_by(name: "REGION V (Bicol Region)")
-region.provinces   # => [#<Province …>, …]
-```
-
----
-
-### Provinces
-
-```ruby
-Pilipinas::Province.all          # => Array of 86 Province objects
-Pilipinas::Province.count        # => 86
-
-province = Pilipinas::Province.find_by(name: "CAMARINES SUR")
-province.cities                  # => Array of City objects
-```
-
----
-
-### Cities / Municipalities
-
-```ruby
-Pilipinas::City.all              # => Array of 1,648 City objects
-Pilipinas::City.count            # => 1648
-
-city = Pilipinas::City.find_by(name: "NAGA CITY")
-city.barangays                   # => Array of Barangay objects
-```
-
----
-
-### Barangays
-
-```ruby
-Pilipinas::Barangay.all          # => Array of 42,027 Barangay objects
-Pilipinas::Barangay.count        # => 42027
-
-Pilipinas::Barangay.find_by(code: "21687")
-Pilipinas::Barangay.find_by(name: "Casay")
-```
-
----
-
-### Entity interface
-
-Every entity object exposes:
-
-| Method     | Returns  | Description                         |
-|------------|----------|-------------------------------------|
-| `#code`    | `String` | Unique geographic code              |
-| `#name`    | `String` | Human-readable name                 |
-| `#to_s`    | `String` | `"Region(code: 1, name: NCR…)"`     |
-| `#inspect` | `String` | `#<Region code="1" name="NCR…">`    |
-| `#==`      | `Boolean`| Equality by class + code            |
-| `#frozen?` | `true`   | Always true — instances are frozen  |
-
----
-
-### Supported find_by attributes
-
-Both `find_by(attr: value)` and `find_by_attr(value)` accept:
-
-| Attribute | Notes                  |
-|-----------|------------------------|
-| `:code`   | Geographic code string |
-| `:name`   | Human-readable name    |
-
-Any other attribute raises `Pilipinas::UnknownAttribute`.
-
----
-
-### Error classes
-
-| Class                         | Superclass         | Raised when                          |
-|-------------------------------|--------------------|--------------------------------------|
-| `Pilipinas::Error`            | `StandardError`    | Base class for all Pilipinas errors  |
-| `Pilipinas::UnknownAttribute` | `Pilipinas::Error` | Unsupported attribute in `find_by_*` |
-
----
-
-## Rails / ActiveRecord integration (optional)
-
-The gem ships with an optional database back-end for applications that prefer SQL queries over in-memory look-ups.
-
-### 1. Generate the migration
-
-```sh
-rails generate pilipinas:migration
-rails db:migrate
-```
-
-This creates four tables: `pilipinas_regions`, `pilipinas_provinces`, `pilipinas_cities`, `pilipinas_barangays`.
-
-### 2. Seed the tables
-
-```sh
-rake pilipinas:load
-```
-
-> **Upgrading from an older version?**
->
-> If `rake pilipinas:load` raises
-> `Pilipinas::Error: pilipinas:load requires a unique index on the location_id column`,
-> your database was created with an earlier migration that did not include those
-> indexes. Add them with the dedicated generator:
->
-> ```sh
-> rails generate pilipinas:code_indexes
-> rails db:migrate
-> ```
->
-> Then re-run `rake pilipinas:load`.
-
-### 3. Use the AR models
-
-```ruby
-region   = Pilipinas::Db::Region.find_by(code: "17744")
-region.provinces.count   # ActiveRecord query
-
-province = Pilipinas::Db::Province.find_by(name: "CAMARINES SUR")
-province.cities          # has_many association
-```
-
-> **Note:** The AR models are auto-loaded and require `activerecord` to be available.
-
-### Read-only behaviour
-
-All four `Pilipinas::Db::*` models are **read-only by default**. Any attempt to call `update!`, `save`, or `destroy` on a persisted record raises `ActiveRecord::ReadOnlyRecord`. This is intentional — the pilipinas tables are static reference data that should never be mutated after seeding.
-
-New (unsaved) records are always writable, so `create!` works normally in the Loader and in test factories.
-
-#### Opting a subclass out of read-only enforcement
-
-If your application inherits from a Pilipinas DB model and legitimately needs write access, set `enforce_readonly` to `false` on the subclass:
-
-```ruby
-class Locations::Barangay < Pilipinas::Db::Barangay
-  self.enforce_readonly = false
-end
-```
-
-This does not affect the parent class or any other model.
-
----
-
-## Testing
-
-The gem ships a ready-made RSpec helper that turns off the read-only guard for the entire test suite — no stubbing required.
-
-```ruby
-# spec/rails_helper.rb  (or spec/support/pilipinas.rb)
-require 'pilipinas/testing/rspec'
-```
-
-This sets `enforce_readonly = false` on all four models (`Region`, `Province`, `City`, `Barangay`) inside a `before(:suite)` hook, so FactoryBot factories, fixtures, and any spec that writes to pilipinas tables work without extra setup.
-
-If you only need writable records in a specific context:
-
-```ruby
-around do |example|
-  Locations::Barangay.enforce_readonly = false
-  example.run
-ensure
-  Locations::Barangay.enforce_readonly = true
-end
-```
-
----
-
-## Advanced
-
-### Cache management
-
-The in-memory cache is global to the process. In long-running processes the data never reloads (intentional — YAML files are static). To force a reload (e.g. in tests):
-
-```ruby
-Pilipinas::Cache.clear
-```
-
-### Thread-safety
-
-All class-level state is initialised through `Pilipinas::Cache`, which uses a `Mutex` with double-checked locking. Entity instances are frozen. The gem is safe to use in multi-threaded applications (Puma, Sidekiq, etc.) without additional synchronisation.
-
----
-
-## Development
-
-```sh
-git clone https://github.com/denmarkmeralpis/pilipinas
-cd pilipinas
-bin/setup          # install dependencies
-bundle exec rake   # run the full test suite
-bin/console        # start an IRB session with the gem loaded
-```
-
-### Running tests
-
-```sh
-bundle exec rspec                     # all specs
-bundle exec rspec spec/pilipinas/     # unit specs only
-bundle exec rubocop                   # lint
-```
-
----
-
-## Contributing
-
-Bug reports and pull requests are welcome on [GitHub](https://github.com/denmarkmeralpis/pilipinas).
-
-Please read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before contributing.
-
----
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](LICENSE).
-
----
-
-## Acknowledgements
-
-The data used in this gem is from `gem pinas`. Kudos!
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/denmarkmeralpis/pilipinas. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
-## Code of Conduct
-
-Everyone interacting in the Pilipinas project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/pilipinas/blob/master/CODE_OF_CONDUCT.md).
+Current geography is adapted from the Philippine Statistics Authority's PSGC publication, with acknowledgement to PSA and its [CC BY 4.0 terms](https://psa.gov.ph/terms-of-use). Postal entries are separately attributed to the Philippine Postal Corporation (PHLPost); its captured page states public-domain content unless otherwise stated. Dataset provenance, source URLs, transformations and checksums are in [DATA.md](docs/DATA.md), `sources/manifest.json`, and `Pilipinas.metadata`. These dataset notices accompany the MIT software license.

@@ -5,12 +5,14 @@ on:
     branches:
       - main
       - master
+      - develop
     tags:
       - "v*"
   pull_request:
     branches:
       - main
       - master
+      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,7 +30,7 @@ jobs:
         os:
           - ubuntu-latest
         ruby:
-          - "3.4"
+          - "3.4.11"
           - "4.0"
         # include:
         #   - os: macos-latest
@@ -49,7 +51,7 @@ jobs:
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v7
-        if: matrix.ruby == '3.4' && matrix.os == 'ubuntu-latest'
+        if: matrix.ruby == '3.4.11' && matrix.os == 'ubuntu-latest'
         with:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -85,7 +87,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4"
+          ruby-version: "3.4.11"
           bundler-cache: true
 
       - name: Build gem
@@ -93,6 +95,9 @@ jobs:
 
       - name: Install built gem
         run: gem install pilipinas-*.gem --no-document
+
+      - name: Smoke-test installed gem without Bundler
+        run: ruby scripts/smoke_installed.rb
 
   # ─── Publish to RubyGems ───────────────────────────────────────────────────
   publish:

@@ -10,8 +10,8 @@ RSpec.describe Pilipinas::Region do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 17 regions' do
-      expect(klass.all.count).to eq(17)
+    it 'returns 18 regions' do
+      expect(klass.all.count).to eq(18)
     end
 
     it 'returns a frozen Array' do
@@ -25,17 +25,17 @@ RSpec.describe Pilipinas::Region do
     end
 
     it 'returns frozen Province instances' do
-      expect(klass.first.provinces.first).to be_frozen
+      expect(klass.find_by_code('0500000000').provinces.first).to be_frozen
     end
   end
 
   describe '.find_by_code' do
     it 'finds a region by code' do
-      expect(klass.find_by_code('17744')).to be_a(described_class)
+      expect(klass.find_by_code('0500000000')).to be_a(described_class)
     end
 
     it 'is case-insensitive' do
-      expect(klass.find_by_code('17744')).to eq(klass.find_by_code('17744'))
+      expect(klass.find_by_code('0500000000')).to eq(klass.find_by_code('0500000000'))
     end
 
     it 'returns nil for an unknown code' do

@@ -10,8 +10,8 @@ RSpec.describe Pilipinas::Province do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 86 provinces' do
-      expect(klass.all.count).to eq(86)
+    it 'returns 82 provinces' do
+      expect(klass.all.count).to eq(82)
     end
   end
 
@@ -23,7 +23,7 @@ RSpec.describe Pilipinas::Province do
 
   describe '.find_by_code' do
     it 'finds a province by code' do
-      expect(klass.find_by_code('2')).to be_a(described_class)
+      expect(klass.find_by_code('1400100000')).to be_a(described_class)
     end
 
     it 'returns nil for an unknown code' do

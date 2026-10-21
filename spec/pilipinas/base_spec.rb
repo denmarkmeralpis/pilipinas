@@ -8,7 +8,7 @@ RSpec.describe Pilipinas::Base do
 
   describe '.count' do
     it 'returns the total number of regions' do
-      expect(klass.count).to eq(17)
+      expect(klass.count).to eq(18)
     end
   end
 
@@ -41,13 +41,13 @@ RSpec.describe Pilipinas::Base do
 
     context 'when attribute is :code' do
       it 'returns the matching record' do
-        expect(klass.find_by(code: '1')).not_to be_nil
+        expect(klass.find_by(code: '1300000000')).not_to be_nil
       end
     end
 
     context 'when attribute is :name' do
       it 'returns the matching record' do
-        expect(klass.find_by(name: 'NCR - National Capital Region')).not_to be_nil
+        expect(klass.find_by(name: 'National Capital Region (NCR)')).not_to be_nil
       end
     end
 

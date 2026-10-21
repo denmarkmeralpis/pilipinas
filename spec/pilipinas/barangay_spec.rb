@@ -10,14 +10,14 @@ RSpec.describe Pilipinas::Barangay do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 42,027 barangays' do
-      expect(klass.all.count).to eq(42_027)
+    it 'returns 42,010 barangays' do
+      expect(klass.all.count).to eq(42_010)
     end
   end
 
   describe '.find_by_code' do
     it 'finds a barangay by code' do
-      expect(klass.find_by_code('21687')).to be_a(described_class)
+      expect(klass.find_by_code('1001322005')).to be_a(described_class)
     end
 
     it 'returns nil for an unknown code' do
@@ -27,12 +27,12 @@ RSpec.describe Pilipinas::Barangay do
 
   describe '.find_by_name' do
     it 'finds a barangay by name' do
-      expect(klass.find_by_name('Casay')).to be_a(described_class)
+      expect(klass.find_by_name('Lambagan')).to be_a(described_class)
     end
 
     it 'is case-insensitive' do
-      lower = klass.find_by_name('casay')
-      upper = klass.find_by_name('Casay')
+      lower = klass.find_by_name('lambagan')
+      upper = klass.find_by_name('Lambagan')
       expect(lower).to eq(upper)
     end
   end

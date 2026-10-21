@@ -3,7 +3,7 @@
 module Pilipinas
   # Thread-safe, process-lifetime in-memory cache.
   #
-  # YAML data files are large (42 k+ barangay records). {Cache} ensures each
+  # Data files are large (42 k+ barangay records). {Cache} ensures each
   # file is parsed exactly once per process and the result is reused for every
   # subsequent look-up. Double-checked locking keeps mutex contention minimal
   # in concurrent environments.

@@ -1,31 +1,13 @@
 # frozen_string_literal: true
 
 module Pilipinas
-  # Represents a city or municipality of the Philippines.
-  #
-  # Cities belong to a {Province} and contain one or more {Barangay} records.
-  #
-  # @example
-  #   city = Pilipinas::City.find_by(name: "NAGA CITY")
-  #   city.barangays  # => [#<Barangay ...>, ...]
-  #
+  # Both cities (level City) and municipalities (level Mun).
   class City < Base
-    # Returns the barangays belonging to this city or municipality.
-    #
-    # Results are cached after the first call.
-    #
-    # @return [Array<Barangay>]
-    def barangays
-      Barangay.assoc_collection(code: code, dir: :cities)
-    end
+    # Manila's barangays are included across all its sub-municipal districts.
+    def barangays = Barangay.where(city_code: code)
+    def submunicipalities = Submunicipality.where(city_code: code)
 
-    class << self
-      private
-
-      # @return [String] absolute path to the cities YAML file
-      def data_file
-        File.join(Pilipinas::DATA_DIR, 'cities.yml')
-      end
-    end
+    def self.data_file = File.join(DATA_DIR, 'cities.json')
+    private_class_method :data_file
   end
 end

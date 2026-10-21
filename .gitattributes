@@ -1,0 +1,3 @@
+# Archived publisher responses must retain their original bytes and checksums.
+sources/*.xlsx binary
+sources/*.html binary

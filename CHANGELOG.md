@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2026-10-21
+
+### Changed
+
+- Replace the 2019 compact directory with the official PSA PSGC snapshot of September 30, 2026 (released October 12): 18 regions, 82 provinces, 149 cities, 1,493 municipalities and 42,010 barangays.
+- Use official ten-digit PSGC strings, preserve correspondence codes, and provide an explicit legacy-ID mapping with unresolved records retained. Duplicate-name `find_by` calls now raise `Pilipinas::AmbiguousMatch`; use `where` or scoped filters.
+- Distinguish NCR, independent cities, Manila districts and non-province areas. Add parent/ancestor queries and complete region-to-city traversal.
+- Keep the optional database loader on its unchanged, explicitly labelled legacy dump. Current directory queries require no database installation or writes.
+
+### Added
+
+- Separate immutable PHLPost postal candidates with matched, missing and ambiguous results, source metadata, incomplete-coverage documentation and malformed-row reporting. No inferred PSGC-to-ZIP joins.
+- Archived official sources, SHA-256 provenance, documented data-refresh rules and validation commands, upgrade notes and consumer handoff for storyseller/dynamic#219.
+- Ruby 3.4.11 CI, source integrity tests and nationwide hierarchy coverage. Software MIT license and existing attribution are preserved; PSA and PHLPost data are separately attributed.
+
+---
+
 ## [1.1.6] - 2026-08-13
 
 ### Dependencies

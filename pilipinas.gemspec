@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Nujian Den Mark Meralpis"]
   spec.email       = ["denmarkmeralpis@gmail.com"]
   spec.summary     = "Complete directory of Philippine regions, provinces, cities, and barangays"
-  spec.description = "Read-only, file-backed directory of Philippine geographic divisions. " \
-                     "Zero runtime dependencies. Lazy-loaded, cached, and thread-safe."
+  spec.description = "Read-only, file-backed PSA PSGC directory and separate PHLPost ZIP candidates. " \
+                     "Dated sources, validated hierarchy, and zero runtime gem dependencies."
   spec.homepage    = "https://github.com/denmarkmeralpis/pilipinas"
   spec.license     = "MIT"
 
@@ -20,8 +20,8 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     "allowed_push_host"     => "https://rubygems.org",
     "homepage_uri"          => spec.homepage,
-    "source_code_uri"       => "https://github.com/denmarkmeralpis/pilipinas/tree/main",
-    "changelog_uri"         => "https://github.com/denmarkmeralpis/pilipinas/blob/main/CHANGELOG.md",
+    "source_code_uri"       => "https://github.com/denmarkmeralpis/pilipinas/tree/master",
+    "changelog_uri"         => "https://github.com/denmarkmeralpis/pilipinas/blob/master/CHANGELOG.md",
     "bug_tracker_uri"       => "https://github.com/denmarkmeralpis/pilipinas/issues",
     "rubygems_mfa_required" => "true"
   }
@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # No runtime dependencies — pure Ruby + stdlib (psych ships with Ruby).
+  # No runtime gem dependencies — pure Ruby + stdlib JSON/Psych.
 
   spec.add_development_dependency "rake",            "~> 13.2"
   spec.add_development_dependency "rspec",           "~> 3.13"

@@ -1,0 +1,16 @@
+[
+{"code":"1380601000","name":"Tondo I/II","level":"SubMun","correspondence_code":"133901000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380602000","name":"Binondo","level":"SubMun","correspondence_code":"133902000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380603000","name":"Quiapo","level":"SubMun","correspondence_code":"133903000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380604000","name":"San Nicolas","level":"SubMun","correspondence_code":"133904000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380605000","name":"Santa Cruz","level":"SubMun","correspondence_code":"133905000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380606000","name":"Sampaloc","level":"SubMun","correspondence_code":"133906000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380607000","name":"San Miguel","level":"SubMun","correspondence_code":"133907000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380608000","name":"Ermita","level":"SubMun","correspondence_code":"133908000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380609000","name":"Intramuros","level":"SubMun","correspondence_code":"133909000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380610000","name":"Malate","level":"SubMun","correspondence_code":"133910000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380611000","name":"Paco","level":"SubMun","correspondence_code":"133911000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380612000","name":"Pandacan","level":"SubMun","correspondence_code":"133912000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380613000","name":"Port Area","level":"SubMun","correspondence_code":"133913000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"},
+{"code":"1380614000","name":"Santa Ana","level":"SubMun","correspondence_code":"133914000","region_code":"1300000000","city_code":"1380600000","parent_code":"1380600000"}
+]

@@ -22,7 +22,8 @@ module Pilipinas
     # Number of rows inserted per SQL statement.
     # 500 balances SQL statement size against the number of round-trips.
     BATCH_SIZE = 500
-    FULL_DATA_FILE = 'pilipinas_data.yml'
+    # Compatibility-only historical dump. The current PSGC API is file-backed.
+    FULL_DATA_FILE = 'legacy/pilipinas_data.yml'
     LOCATION_TABLE = 'pilipinas_locations'
 
     FULL_DATA_SEEDS = [
