@@ -8,7 +8,7 @@ A complete, read-only directory of Philippine geographic divisions:
 
 ```
 Region  →  Province  →  City / Municipality  →  Barangay
-(17)         (86)           (1,648)              (42,027)
+(18)         (89)           (1,656)              (42,010)
 ```
 
 ## Features
@@ -61,9 +61,9 @@ Rails applications load the gem automatically via Bundler.
 ### Regions
 
 ```ruby
-# All 17 regions (returns a frozen Array)
+# All 18 regions (returns a frozen Array)
 Pilipinas::Region.all            # => [#<Region code="1" name="NCR…">, …]
-Pilipinas::Region.count          # => 17
+Pilipinas::Region.count          # => 18
 Pilipinas::Region.first          # => #<Region …>
 Pilipinas::Region.last           # => #<Region …>
 
@@ -85,8 +85,8 @@ region.provinces   # => [#<Province …>, …]
 ### Provinces
 
 ```ruby
-Pilipinas::Province.all          # => Array of 86 Province objects
-Pilipinas::Province.count        # => 86
+Pilipinas::Province.all          # => Array of 89 Province objects
+Pilipinas::Province.count        # => 89
 
 province = Pilipinas::Province.find_by(name: "CAMARINES SUR")
 province.cities                  # => Array of City objects
@@ -97,10 +97,10 @@ province.cities                  # => Array of City objects
 ### Cities / Municipalities
 
 ```ruby
-Pilipinas::City.all              # => Array of 1,648 City objects
-Pilipinas::City.count            # => 1648
+Pilipinas::City.all              # => Array of 1,656 City objects
+Pilipinas::City.count            # => 1656
 
-city = Pilipinas::City.find_by(name: "NAGA CITY")
+city = Pilipinas::City.find_by(name: "City of Naga")
 city.barangays                   # => Array of Barangay objects
 ```
 
@@ -109,8 +109,8 @@ city.barangays                   # => Array of Barangay objects
 ### Barangays
 
 ```ruby
-Pilipinas::Barangay.all          # => Array of 42,027 Barangay objects
-Pilipinas::Barangay.count        # => 42027
+Pilipinas::Barangay.all          # => Array of 42,010 Barangay objects
+Pilipinas::Barangay.count        # => 42010
 
 Pilipinas::Barangay.find_by(code: "21687")
 Pilipinas::Barangay.find_by(name: "Casay")
@@ -297,6 +297,8 @@ The gem is available as open source under the terms of the [MIT License](LICENSE
 ## Acknowledgements
 
 The data used in this gem is from `gem pinas`. Kudos!
+
+Geography is refreshed from the [Philippine Statistics Authority PSGC as of 30 September 2026](https://psa.gov.ph/system/files/scd/PSGC-3Q-2026-Publication-Datafile.xlsx), released 12 October 2026, with acknowledgement to PSA under its [CC BY 4.0 terms](https://psa.gov.ph/terms-of-use). Existing internal lookup IDs are retained where verified. The counts above follow the gem's existing display layout: 89 province/group entries include 82 provinces and seven non-province groups; 1,656 city/district entries include 149 cities, 1,493 municipalities and 14 Manila districts. These display groups are not additional administrative provinces or municipalities. Independent cities retain geographic province/display-group placement under this existing layout; that placement does not assert provincial administrative jurisdiction.
 
 ## Development
 
