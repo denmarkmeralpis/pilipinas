@@ -10,8 +10,8 @@ RSpec.describe Pilipinas::Province do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 86 provinces' do
-      expect(klass.all.count).to eq(86)
+    it 'returns 89 province and display-group entries' do
+      expect(klass.all.count).to eq(89)
     end
   end
 

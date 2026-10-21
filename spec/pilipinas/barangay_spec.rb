@@ -10,8 +10,8 @@ RSpec.describe Pilipinas::Barangay do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 42,027 barangays' do
-      expect(klass.all.count).to eq(42_027)
+    it 'returns 42,010 barangays' do
+      expect(klass.all.count).to eq(42_010)
     end
   end
 
