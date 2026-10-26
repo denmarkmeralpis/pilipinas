@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-10-26
+
+### Changed
+
+- Bundled geography data refreshed from the PSA PSGC snapshot of 30 September 2026: 18 regions, 89 provinces, 1,656 cities/municipalities and 42,010 barangays.
+- **Breaking:** names now follow PSA spelling and capitalisation (e.g. `NAGA CITY` → `City of Naga`, `NCR` → `National Capital Region (NCR)`), so `find_by(name: …)` and `by_name` lookups that use the old names no longer match.
+- `rake pilipinas:load` now deletes rows whose `location_id` is not in the bundled data, so re-running it after an upgrade removes locations dropped from the PSGC instead of leaving them in associations and nested-set queries. The task prints how many rows it removed from each table, and `Pilipinas::Loader.run` returns those counts keyed by table name.
+- If an application foreign key still references a row that would be deleted, `rake pilipinas:load` raises `Pilipinas::Error` and rolls back.
+
+### Upgrading
+
+See [UPGRADING.md](UPGRADING.md) for step-by-step guides from 0.0.1, 1.0.x and 1.1.x, including the replacement codes for removed locations and a dry run that previews what the load will delete. In short:
+
+- **1.1.2 – 1.1.6 databases:** re-run `rake pilipinas:load`. It deletes 1 province, 5 cities/municipalities and 181 barangays; all other rows keep their `id`s.
+- **1.0.0 – 1.1.1 databases:** backfill `location_id` from `code` before loading. Otherwise every row is replaced with a new `id`.
+
+---
+
 ## [1.1.6] - 2026-08-13
 
 ### Dependencies
@@ -149,6 +167,7 @@ Complete rewrite of the gem. Zero runtime dependencies.
 - Rails generator for migrations.
 - Railtie for automatic Rake task loading in Rails apps.
 
+[1.2.0]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.6...v1.2.0
 [1.1.6]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.3...v1.1.4

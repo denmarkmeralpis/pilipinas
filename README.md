@@ -188,6 +188,12 @@ rake pilipinas:load
 >
 > Then re-run `rake pilipinas:load`.
 
+Re-run `rake pilipinas:load` after every gem upgrade. It upserts rows by `location_id` and
+deletes rows whose `location_id` is no longer in the bundled data, so the tables always match the
+installed gem; the task prints how many rows it removed from each table. If your own tables reference
+`pilipinas_*` rows, follow [UPGRADING.md](UPGRADING.md) first: with a database foreign key the load
+raises `Pilipinas::Error` and rolls back, without one the references are left pointing at deleted rows.
+
 ### 3. Use the AR models
 
 ```ruby

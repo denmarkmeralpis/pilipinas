@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'loader/stale_rows'
+
 module Pilipinas
   # Seeds the application database with Philippine geographic data.
   #
@@ -14,9 +16,12 @@ module Pilipinas
   #   ActiveRecord insert payload in memory.
   # * **Atomic** — all four tables are seeded inside a single transaction; a
   #   failure rolls back everything, leaving no partial data.
+  # * **Exact** — rows whose +location_id+ is not in the bundled data (compact
+  #   rows from older loader versions, or locations dropped from a newer PSGC
+  #   snapshot) are deleted, so after a run the tables match the installed gem.
   #
   # @example
-  #   Pilipinas::Loader.run
+  #   Pilipinas::Loader.run # => { "pilipinas_regions" => 0, …, "pilipinas_barangays" => 181 }
   #
   module Loader
     # Number of rows inserted per SQL statement.
@@ -40,17 +45,18 @@ module Pilipinas
     class << self
       # Seed all four geographic tables inside a single transaction.
       #
-      # @return [void]
+      # @return [Hash{String => Integer}] stale rows deleted, keyed by table name
       def run
         records = nil
         column_indexes, records = full_location_table
 
         ActiveRecord::Base.uncached do
           ActiveRecord::Base.transaction do
-            FULL_DATA_SEEDS.each do |model_name, type, attributes|
+            FULL_DATA_SEEDS.to_h do |model_name, type, attributes|
               model = Db.const_get(model_name)
-              delete_stale_compact_rows(model)
+              deleted = StaleRows.delete(model, records, column_indexes, type)
               seed_full_data(model, records, column_indexes, type, attributes)
+              [model.table_name, deleted]
             end
           end
         end
@@ -112,17 +118,6 @@ module Pilipinas
       def full_data_attributes(record, attribute_indexes, now)
         attribute_indexes.to_h { |attribute, index| [attribute, record[index]] }
                          .merge('created_at' => now, 'updated_at' => now)
-      end
-
-      # Older loader versions seeded compact file-backed rows with only +code+
-      # and +name+. Those rows cannot be upserted into the full-data records
-      # because their +code+ values differ from the PSA codes in
-      # +pilipinas_data.yml+, so remove them before inserting the canonical set.
-      #
-      # @param model [Class] ActiveRecord model class
-      # @return [void]
-      def delete_stale_compact_rows(model)
-        model.where(location_id: nil).delete_all
       end
 
       # Insert or update rows for one table from a YAML file.
