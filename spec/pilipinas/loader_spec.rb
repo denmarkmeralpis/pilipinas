@@ -42,7 +42,7 @@ RSpec.describe Pilipinas::Loader do
       expect(Pilipinas::Db::Region.find_by(location_id: 1)).to have_attributes(
         code: '130000000',
         lft: 1,
-        rgt: 3484,
+        rgt: 3494,
         longitude: '121.0222565',
         latitude: '14.6090537'
       )

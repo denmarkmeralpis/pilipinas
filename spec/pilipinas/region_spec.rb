@@ -10,8 +10,8 @@ RSpec.describe Pilipinas::Region do
       expect(klass.all).to be_an(Array)
     end
 
-    it 'returns 17 regions' do
-      expect(klass.all.count).to eq(17)
+    it 'returns 18 regions' do
+      expect(klass.all.count).to eq(18)
     end
 
     it 'returns a frozen Array' do
