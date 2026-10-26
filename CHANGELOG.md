@@ -18,18 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Upgrading
 
-Re-run `rake pilipinas:load`. On a database seeded with 1.1.x it deletes 1 province, 5 towns and 181 barangays. The province and towns were split or re-coded by the PSA and have new `location_id`s, so update any stored references:
+See [UPGRADING.md](UPGRADING.md) for step-by-step guides from 0.0.1, 1.0.x and 1.1.x, including the replacement codes for removed locations and a dry run that previews what the load will delete. In short:
 
-| Removed (`location_id`) | Replacement (`location_id`) |
-|---|---|
-| MAGUINDANAO (42589) | Maguindanao del Norte (43781), Maguindanao del Sur (43782) |
-| DON MARCELINO (38031) | Don Marcelino (43783) |
-| JOSE ABAD SANTOS (TRINIDAD) (38069) | Jose Abad Santos (43784) |
-| MALITA (38166) | Malita (43785) |
-| SANTA MARIA (38268) | Santa Maria (43786) |
-| SARANGANI (38291) | Sarangani (43787) |
-
-Without a database foreign key, find references to deleted rows after loading with a query such as `Address.where.not(barangay_location_id: Pilipinas::Db::Barangay.select(:location_id))`.
+- **1.1.2 – 1.1.6 databases:** re-run `rake pilipinas:load`. It deletes 1 province, 5 cities/municipalities and 181 barangays; all other rows keep their `id`s.
+- **1.0.0 – 1.1.1 databases:** backfill `location_id` from `code` before loading. Otherwise every row is replaced with a new `id`.
 
 ---
 
@@ -175,6 +167,7 @@ Complete rewrite of the gem. Zero runtime dependencies.
 - Rails generator for migrations.
 - Railtie for automatic Rake task loading in Rails apps.
 
+[1.2.0]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.6...v1.2.0
 [1.1.6]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/denmarkmeralpis/pilipinas/compare/v1.1.3...v1.1.4
