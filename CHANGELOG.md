@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-10-26
+
+### Changed
+
+- Bundled geography data refreshed from the PSA PSGC snapshot of 30 September 2026: 18 regions, 89 provinces, 1,656 cities/municipalities and 42,010 barangays.
+- **Breaking:** names now follow PSA spelling and capitalisation (e.g. `NAGA CITY` → `City of Naga`, `NCR` → `National Capital Region (NCR)`), so `find_by(name: …)` and `by_name` lookups that use the old names no longer match.
+- `rake pilipinas:load` now deletes rows whose `location_id` is not in the bundled data, so re-running it after an upgrade removes locations dropped from the PSGC instead of leaving them in associations and nested-set queries. The task prints how many rows it removed from each table, and `Pilipinas::Loader.run` returns those counts keyed by table name.
+- If an application foreign key still references a row that would be deleted, `rake pilipinas:load` raises `Pilipinas::Error` and rolls back.
+
+### Upgrading
+
+Re-run `rake pilipinas:load`. On a database seeded with 1.1.x it deletes 1 province, 5 towns and 181 barangays. The province and towns were split or re-coded by the PSA and have new `location_id`s, so update any stored references:
+
+| Removed (`location_id`) | Replacement (`location_id`) |
+|---|---|
+| MAGUINDANAO (42589) | Maguindanao del Norte (43781), Maguindanao del Sur (43782) |
+| DON MARCELINO (38031) | Don Marcelino (43783) |
+| JOSE ABAD SANTOS (TRINIDAD) (38069) | Jose Abad Santos (43784) |
+| MALITA (38166) | Malita (43785) |
+| SANTA MARIA (38268) | Santa Maria (43786) |
+| SARANGANI (38291) | Sarangani (43787) |
+
+Without a database foreign key, find references to deleted rows after loading with a query such as `Address.where.not(barangay_location_id: Pilipinas::Db::Barangay.select(:location_id))`.
+
+---
+
 ## [1.1.6] - 2026-08-13
 
 ### Dependencies
