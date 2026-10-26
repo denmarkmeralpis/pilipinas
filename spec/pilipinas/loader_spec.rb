@@ -36,6 +36,29 @@ RSpec.describe Pilipinas::Loader do
       expect(Pilipinas::Db::Province.find_by(location_id: 2)).to have_attributes(code: '133900000')
     end
 
+    it 'removes locations that are no longer in the bundled data' do
+      Pilipinas::Db::Province.create!(location_id: 42_589, parent_id: 1, code: '153800000', name: 'MAGUINDANAO')
+      Pilipinas::Db::Barangay.create!(location_id: 1659, parent_id: 4, code: '137501176', name: 'Barangay 176')
+
+      Pilipinas::Loader.run
+
+      expect(Pilipinas::Db::Province.find_by(location_id: 42_589)).to be_nil
+      expect(Pilipinas::Db::Barangay.find_by(location_id: 1659)).to be_nil
+      expect(Pilipinas::Db::City.find_by(location_id: 4).barangays.where(location_id: 1659)).to be_empty
+    end
+
+    it 'returns the number of stale rows deleted from each table' do
+      Pilipinas::Db::Region.create!(code: '1', name: 'NCR - National Capital Region')
+      Pilipinas::Db::Barangay.create!(location_id: 1659, parent_id: 4, code: '137501176', name: 'Barangay 176')
+
+      expect(Pilipinas::Loader.run).to eq(
+        'pilipinas_regions' => 1,
+        'pilipinas_provinces' => 0,
+        'pilipinas_cities' => 0,
+        'pilipinas_barangays' => 1
+      )
+    end
+
     it 'seeds complete attributes from the full data file' do
       Pilipinas::Loader.run
 
